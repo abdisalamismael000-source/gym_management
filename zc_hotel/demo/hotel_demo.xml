@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Property -->
+    <record id="property_grand_vista" model="hotel.property">
+        <field name="name">Grand Vista Hotel</field>
+        <field name="code">GV</field>
+    </record>
+
+    <!-- Distribution channels -->
+    <record id="channel_direct" model="hotel.channel">
+        <field name="name">Direct</field>
+        <field name="channel_type">direct</field>
+    </record>
+    <record id="channel_booking" model="hotel.channel">
+        <field name="name">Booking.com</field>
+        <field name="channel_type">booking</field>
+        <field name="commission_pct">15.0</field>
+    </record>
+    <record id="channel_expedia" model="hotel.channel">
+        <field name="name">Expedia</field>
+        <field name="channel_type">expedia</field>
+        <field name="commission_pct">18.0</field>
+    </record>
+
     <!-- Amenities -->
     <record id="amenity_wifi" model="hotel.amenity">
         <field name="name">Free Wi-Fi</field>
@@ -69,34 +91,42 @@
     <record id="room_101" model="hotel.room">
         <field name="name">101</field><field name="floor">1</field>
         <field name="room_type_id" ref="room_type_standard"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_102" model="hotel.room">
         <field name="name">102</field><field name="floor">1</field>
         <field name="room_type_id" ref="room_type_standard"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_103" model="hotel.room">
         <field name="name">103</field><field name="floor">1</field>
         <field name="room_type_id" ref="room_type_standard"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_201" model="hotel.room">
         <field name="name">201</field><field name="floor">2</field>
         <field name="room_type_id" ref="room_type_deluxe"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_202" model="hotel.room">
         <field name="name">202</field><field name="floor">2</field>
         <field name="room_type_id" ref="room_type_deluxe"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_203" model="hotel.room">
         <field name="name">203</field><field name="floor">2</field>
         <field name="room_type_id" ref="room_type_deluxe"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_301" model="hotel.room">
         <field name="name">301</field><field name="floor">3</field>
         <field name="room_type_id" ref="room_type_suite"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
     <record id="room_302" model="hotel.room">
         <field name="name">302</field><field name="floor">3</field>
         <field name="room_type_id" ref="room_type_suite"/>
+        <field name="property_id" ref="property_grand_vista"/>
     </record>
 
     <!-- Seasonal rate plan (high season) -->
@@ -134,6 +164,17 @@
         <field name="board_type">bb</field>
         <field name="state">confirmed</field>
         <field name="source">website</field>
+        <field name="channel_id" ref="channel_direct"/>
+    </record>
+
+    <!-- Sample guest service booking -->
+    <record id="service_spa_demo" model="hotel.service.booking">
+        <field name="partner_id" ref="guest_john"/>
+        <field name="reservation_id" ref="reservation_demo_1"/>
+        <field name="service_type">spa</field>
+        <field name="quantity">1</field>
+        <field name="price_unit">60.0</field>
+        <field name="state">booked</field>
     </record>
     <record id="reservation_demo_2" model="hotel.reservation">
         <field name="partner_id" ref="guest_maria"/>

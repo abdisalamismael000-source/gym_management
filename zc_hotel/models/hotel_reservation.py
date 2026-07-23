@@ -17,7 +17,12 @@ class HotelReservation(models.Model):
         domain=[('is_corporate_account', '=', True)],
         help='Company the stay is billed to, if different from the guest.')
     room_id = fields.Many2one('hotel.room', string='Room', required=True, tracking=True)
+    property_id = fields.Many2one(related='room_id.property_id', store=True, string='Property')
     room_type_id = fields.Many2one(related='room_id.room_type_id', store=True)
+    channel_id = fields.Many2one('hotel.channel', string='Channel')
+    channel_reference = fields.Char(
+        string='Channel Reference', copy=False,
+        help='Booking reference from the OTA / distribution channel.')
     check_in = fields.Date(required=True, tracking=True, default=fields.Date.context_today)
     check_out = fields.Date(required=True, tracking=True)
     arrival_time = fields.Char(string='Expected Arrival')

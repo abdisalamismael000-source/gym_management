@@ -7,6 +7,7 @@ class HotelRoom(models.Model):
     _order = 'name'
 
     name = fields.Char(string='Room Number', required=True)
+    property_id = fields.Many2one('hotel.property', string='Property')
     room_type_id = fields.Many2one('hotel.room.type', string='Room Type', required=True)
     floor = fields.Char()
     capacity = fields.Integer(related='room_type_id.capacity', store=True,

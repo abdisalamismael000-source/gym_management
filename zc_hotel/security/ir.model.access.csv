@@ -17,3 +17,9 @@ access_hotel_housekeeping_user,hotel.housekeeping.user,model_hotel_housekeeping,
 access_hotel_housekeeping_manager,hotel.housekeeping.manager,model_hotel_housekeeping,group_hotel_manager,1,1,1,1
 access_hotel_availability_wizard_user,hotel.room.availability.wizard.user,model_hotel_room_availability_wizard,group_hotel_user,1,1,1,1
 access_hotel_report_wizard_user,hotel.report.wizard.user,model_hotel_report_wizard,group_hotel_user,1,1,1,1
+access_hotel_property_user,hotel.property.user,model_hotel_property,group_hotel_user,1,0,0,0
+access_hotel_property_manager,hotel.property.manager,model_hotel_property,group_hotel_manager,1,1,1,1
+access_hotel_channel_user,hotel.channel.user,model_hotel_channel,group_hotel_user,1,0,0,0
+access_hotel_channel_manager,hotel.channel.manager,model_hotel_channel,group_hotel_manager,1,1,1,1
+access_hotel_service_booking_user,hotel.service.booking.user,model_hotel_service_booking,group_hotel_user,1,1,1,0
+access_hotel_service_booking_manager,hotel.service.booking.manager,model_hotel_service_booking,group_hotel_manager,1,1,1,1

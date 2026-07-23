@@ -21,6 +21,7 @@ nightly reports.
 | **`zc_hotel_pos`** | Charges restaurant / bar / spa / minibar **POS outlets** to the guest's room folio, split by outlet. |
 | **`zc_hotel_website`** | Public **online booking engine** — room search, live availability, booking form, and a "My Bookings" portal page. |
 | **`zc_hotel_maintenance`** | Links rooms to **maintenance equipment** and raises repair tickets from a room or housekeeping task. |
+| **`zc_hotel_event`** | **Banquet & events** — function rooms and event bookings (weddings, conferences) with no double-booking and organiser invoicing. |
 
 ## Highlight features
 
@@ -35,8 +36,18 @@ nightly reports.
   assigned to HR staff; completing a task frees the room.
 - **Rate plans** — seasonal, per-room-type pricing and board types (RO / BB /
   HB / FB) that feed folio charges automatically.
-- **Guest CRM** — ID / nationality / preferences, VIP flag, loyalty points and
-  stay history; corporate accounts.
+- **Guest CRM & loyalty** — ID / nationality / preferences, VIP flag, loyalty
+  points with automatic **tiers** (Bronze → Platinum), stay history and
+  corporate accounts.
+- **Front-desk dashboard, redesigned** — a modern card UI with live sparklines
+  and a room-status donut (occupancy, ADR, RevPAR, arrivals/departures).
+- **Multi-property** — group rooms and reservations under separate properties.
+- **Guest services** — spa, transfers, tours and late check-outs booked and
+  posted straight to the folio.
+- **Distribution channels** — record OTA channels and per-booking references
+  (Booking.com, Expedia…). Note: live two-way OTA sync needs each provider's
+  paid API and is provided as a scaffold / integration point, not a working
+  connector.
 - **Billing** — deposits, configurable city / tourism tax, one-click invoicing
   to Odoo Accounting.
 - **Owner report pack** — Manager Flash / daily report, Arrivals, Departures,

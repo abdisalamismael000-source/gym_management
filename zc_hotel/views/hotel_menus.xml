@@ -23,6 +23,9 @@
     <menuitem id="menu_hotel_housekeeping" name="Housekeeping"
               parent="menu_hotel_operations" action="action_hotel_housekeeping"
               sequence="30"/>
+    <menuitem id="menu_hotel_service" name="Guest Services"
+              parent="menu_hotel_operations" action="action_hotel_service"
+              sequence="35"/>
     <menuitem id="menu_hotel_rooms_board" name="Rooms Board"
               parent="menu_hotel_operations" action="action_hotel_room"
               sequence="40"/>
@@ -56,6 +59,10 @@
               parent="menu_hotel_config" action="action_hotel_rate_plan" sequence="30"/>
     <menuitem id="menu_hotel_amenity" name="Amenities"
               parent="menu_hotel_config" action="action_hotel_amenity" sequence="40"/>
+    <menuitem id="menu_hotel_property" name="Properties"
+              parent="menu_hotel_config" action="action_hotel_property" sequence="50"/>
+    <menuitem id="menu_hotel_channel" name="Channels"
+              parent="menu_hotel_config" action="action_hotel_channel" sequence="60"/>
     <menuitem id="menu_hotel_settings" name="Settings"
               parent="menu_hotel_config" action="action_hotel_config_settings"
               sequence="90"/>

@@ -25,6 +25,7 @@
                         <group string="Guest Profile">
                             <field name="vip"/>
                             <field name="loyalty_points"/>
+                            <field name="loyalty_tier"/>
                             <field name="stay_count"/>
                         </group>
                     </group>

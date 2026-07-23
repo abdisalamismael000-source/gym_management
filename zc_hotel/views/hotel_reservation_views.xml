@@ -61,7 +61,11 @@
                             <field name="company_account_id"/>
                             <field name="room_id"/>
                             <field name="room_type_id"/>
+                            <field name="property_id"/>
                             <field name="source"/>
+                            <field name="channel_id"/>
+                            <field name="channel_reference"
+                                   invisible="source != 'ota'"/>
                         </group>
                         <group>
                             <field name="check_in"/>

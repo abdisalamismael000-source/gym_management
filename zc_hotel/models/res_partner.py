@@ -20,6 +20,13 @@ class ResPartner(models.Model):
         help='Pillow type, floor preference, allergies, VIP notes, etc.')
     vip = fields.Boolean(string='VIP Guest')
     loyalty_points = fields.Integer(string='Loyalty Points', default=0)
+    loyalty_tier = fields.Selection([
+        ('none', 'Standard'),
+        ('bronze', 'Bronze'),
+        ('silver', 'Silver'),
+        ('gold', 'Gold'),
+        ('platinum', 'Platinum'),
+    ], compute='_compute_loyalty_tier', store=True, string='Loyalty Tier')
 
     # Corporate account flag — a company that reservations can be billed to.
     is_corporate_account = fields.Boolean(string='Corporate Account')
@@ -30,6 +37,22 @@ class ResPartner(models.Model):
         compute='_compute_reservation_stats', string='Reservations')
     stay_count = fields.Integer(
         compute='_compute_reservation_stats', string='Completed Stays')
+
+    @api.depends('loyalty_points')
+    def _compute_loyalty_tier(self):
+        # Thresholds in loyalty points (≈ 1 point per night stayed).
+        for partner in self:
+            pts = partner.loyalty_points
+            if pts >= 100:
+                partner.loyalty_tier = 'platinum'
+            elif pts >= 50:
+                partner.loyalty_tier = 'gold'
+            elif pts >= 20:
+                partner.loyalty_tier = 'silver'
+            elif pts >= 5:
+                partner.loyalty_tier = 'bronze'
+            else:
+                partner.loyalty_tier = 'none'
 
     @api.depends('reservation_ids', 'reservation_ids.state')
     def _compute_reservation_stats(self):

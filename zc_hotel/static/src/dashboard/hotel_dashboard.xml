@@ -1,97 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="zc_hotel.HotelDashboard">
-        <div class="o_hotel_dashboard p-3">
-            <div t-if="state.loading" class="text-center p-5">
+        <div class="o_hotel_dashboard">
+            <div t-if="state.loading" class="o_hotel_loading">
                 <i class="fa fa-spinner fa-spin fa-2x"/>
             </div>
-            <div t-else="">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="mb-0">Front Desk</h2>
-                    <button class="btn btn-secondary btn-sm" t-on-click="() => this.loadData()">
+            <div t-else="" class="o_hotel_dash_inner">
+
+                <!-- Header -->
+                <div class="o_hotel_head">
+                    <div>
+                        <h1 class="o_hotel_title">Front Desk</h1>
+                        <p class="o_hotel_subtitle" t-esc="state.data.company_name"/>
+                    </div>
+                    <button class="btn o_hotel_refresh" t-on-click="() => this.loadData()">
                         <i class="fa fa-refresh me-1"/> Refresh
                     </button>
                 </div>
 
-                <!-- KPI row -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-3 col-6">
-                        <div class="o_hotel_kpi card h-100">
-                            <div class="card-body">
-                                <div class="o_hotel_kpi_label">Occupancy</div>
-                                <div class="o_hotel_kpi_value"><t t-esc="state.data.occupancy_rate"/>%</div>
-                            </div>
+                <!-- KPI cards with sparklines -->
+                <div class="o_hotel_kpi_row">
+                    <t t-set="spOcc" t-value="sparkline(state.data.trends.occupancy)"/>
+                    <div class="o_hotel_card o_hotel_kpi">
+                        <div class="o_hotel_kpi_top">
+                            <span class="o_hotel_icon o_bg_indigo"><i class="fa fa-bed"/></span>
+                            <span class="o_hotel_kpi_label">Occupancy</span>
                         </div>
+                        <div class="o_hotel_kpi_value"><t t-esc="state.data.occupancy_rate"/>%</div>
+                        <svg class="o_hotel_spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                            <path t-att-d="spOcc.area" class="o_spark_area o_stroke_indigo"/>
+                            <polyline t-att-points="spOcc.line" class="o_spark_line o_stroke_indigo"/>
+                        </svg>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="o_hotel_kpi card h-100">
-                            <div class="card-body">
-                                <div class="o_hotel_kpi_label">ADR</div>
-                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.adr)"/>
-                            </div>
+
+                    <t t-set="spAdr" t-value="sparkline(state.data.trends.adr)"/>
+                    <div class="o_hotel_card o_hotel_kpi">
+                        <div class="o_hotel_kpi_top">
+                            <span class="o_hotel_icon o_bg_teal"><i class="fa fa-line-chart"/></span>
+                            <span class="o_hotel_kpi_label">ADR</span>
                         </div>
+                        <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.adr)"/>
+                        <svg class="o_hotel_spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                            <path t-att-d="spAdr.area" class="o_spark_area o_stroke_teal"/>
+                            <polyline t-att-points="spAdr.line" class="o_spark_line o_stroke_teal"/>
+                        </svg>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="o_hotel_kpi card h-100">
-                            <div class="card-body">
-                                <div class="o_hotel_kpi_label">RevPAR</div>
-                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.revpar)"/>
-                            </div>
+
+                    <t t-set="spRev" t-value="sparkline(state.data.trends.revenue)"/>
+                    <div class="o_hotel_card o_hotel_kpi">
+                        <div class="o_hotel_kpi_top">
+                            <span class="o_hotel_icon o_bg_amber"><i class="fa fa-money"/></span>
+                            <span class="o_hotel_kpi_label">Room Revenue (MTD)</span>
                         </div>
+                        <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.room_revenue)"/>
+                        <svg class="o_hotel_spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                            <path t-att-d="spRev.area" class="o_spark_area o_stroke_amber"/>
+                            <polyline t-att-points="spRev.line" class="o_spark_line o_stroke_amber"/>
+                        </svg>
                     </div>
-                    <div class="col-md-3 col-6">
-                        <div class="o_hotel_kpi card h-100">
-                            <div class="card-body">
-                                <div class="o_hotel_kpi_label">Revenue (MTD)</div>
-                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.total_revenue)"/>
-                            </div>
+
+                    <t t-set="spArr" t-value="sparkline(state.data.trends.arrivals)"/>
+                    <div class="o_hotel_card o_hotel_kpi">
+                        <div class="o_hotel_kpi_top">
+                            <span class="o_hotel_icon o_bg_pink"><i class="fa fa-plane"/></span>
+                            <span class="o_hotel_kpi_label">RevPAR</span>
                         </div>
+                        <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.revpar)"/>
+                        <svg class="o_hotel_spark" viewBox="0 0 100 32" preserveAspectRatio="none">
+                            <path t-att-d="spArr.area" class="o_spark_area o_stroke_pink"/>
+                            <polyline t-att-points="spArr.line" class="o_spark_line o_stroke_pink"/>
+                        </svg>
                     </div>
                 </div>
 
-                <!-- Movements -->
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4 col-6">
-                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openArrivals()">
-                            <div class="card-body text-center">
-                                <div class="o_hotel_tile_value text-primary"><t t-esc="state.data.arrivals"/></div>
-                                <div>Arrivals Today</div>
+                <!-- Main grid: movements + donut -->
+                <div class="o_hotel_main_grid">
+                    <!-- Movements -->
+                    <div class="o_hotel_card o_hotel_movements">
+                        <h5 class="o_hotel_card_title">Today</h5>
+                        <div class="o_hotel_tiles">
+                            <div class="o_hotel_tile" t-on-click="() => this.openArrivals()">
+                                <div class="o_hotel_tile_value o_text_indigo"><t t-esc="state.data.arrivals"/></div>
+                                <div class="o_hotel_tile_label">Arrivals</div>
+                            </div>
+                            <div class="o_hotel_tile" t-on-click="() => this.openDepartures()">
+                                <div class="o_hotel_tile_value o_text_amber"><t t-esc="state.data.departures"/></div>
+                                <div class="o_hotel_tile_label">Departures</div>
+                            </div>
+                            <div class="o_hotel_tile" t-on-click="() => this.openInHouse()">
+                                <div class="o_hotel_tile_value o_text_teal"><t t-esc="state.data.in_house"/></div>
+                                <div class="o_hotel_tile_label">In House</div>
+                            </div>
+                            <div class="o_hotel_tile" t-on-click="() => this.openHousekeeping()">
+                                <div class="o_hotel_tile_value o_text_pink"><t t-esc="state.data.dirty_rooms"/></div>
+                                <div class="o_hotel_tile_label">To Clean</div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-6">
-                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openDepartures()">
-                            <div class="card-body text-center">
-                                <div class="o_hotel_tile_value text-warning"><t t-esc="state.data.departures"/></div>
-                                <div>Departures Today</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 col-6">
-                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openInHouse()">
-                            <div class="card-body text-center">
-                                <div class="o_hotel_tile_value text-success"><t t-esc="state.data.in_house"/></div>
-                                <div>In House</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Room status -->
-                <div class="row g-3">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Room Status</h5>
-                                <table class="table table-sm mb-0">
-                                    <tbody>
-                                        <tr><td>Available</td><td class="text-end"><t t-esc="state.data.available_rooms"/></td></tr>
-                                        <tr><td>Occupied</td><td class="text-end"><t t-esc="state.data.occupied_rooms"/></td></tr>
-                                        <tr><td>Needs Cleaning</td><td class="text-end"><t t-esc="state.data.dirty_rooms"/></td></tr>
-                                        <tr><td>Out of Service</td><td class="text-end"><t t-esc="state.data.out_of_service"/></td></tr>
-                                        <tr class="fw-bold"><td>Total Rooms</td><td class="text-end"><t t-esc="state.data.sellable_rooms"/></td></tr>
-                                    </tbody>
-                                </table>
+                    <!-- Room status donut -->
+                    <div class="o_hotel_card o_hotel_donut_card">
+                        <h5 class="o_hotel_card_title">Room Status</h5>
+                        <div class="o_hotel_donut_wrap">
+                            <svg class="o_hotel_donut" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="42" class="o_donut_track"/>
+                                <t t-foreach="donutSegments" t-as="seg" t-key="seg_index">
+                                    <circle cx="50" cy="50" r="42" fill="none"
+                                            t-att-stroke="seg.color" stroke-width="12"
+                                            t-att-stroke-dasharray="seg.dash"
+                                            t-att-stroke-dashoffset="seg.offset"
+                                            transform="rotate(-90 50 50)"/>
+                                </t>
+                                <text x="50" y="47" class="o_donut_num" t-esc="totalRooms"/>
+                                <text x="50" y="60" class="o_donut_cap">Rooms</text>
+                            </svg>
+                            <div class="o_hotel_legend">
+                                <div class="o_hotel_legend_row" t-foreach="state.data.status_breakdown" t-as="s" t-key="s_index">
+                                    <span class="o_legend_dot" t-attf-style="background-color: {{ s.color }};"/>
+                                    <span class="o_legend_label" t-esc="s.label"/>
+                                    <span class="o_legend_val" t-esc="s.value"/>
+                                </div>
                             </div>
                         </div>
                     </div>
