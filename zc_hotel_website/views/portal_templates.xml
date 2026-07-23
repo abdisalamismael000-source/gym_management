@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal home card -->
+    <template id="portal_my_home_bookings" name="Portal My Home: Bookings"
+              inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Bookings</t>
+                <t t-set="url" t-value="'/my/bookings'"/>
+                <t t-set="placeholder_count" t-value="'booking_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- My Bookings list -->
+    <template id="portal_my_bookings" name="My Bookings">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <div class="o_portal_my_doc_table">
+                <h3 class="mb-3">My Bookings</h3>
+                <t t-if="not reservations">
+                    <p>You have no bookings yet.
+                        <a href="/hotel/booking">Book a room</a>.</p>
+                </t>
+                <table t-if="reservations" class="table">
+                    <thead>
+                        <tr>
+                            <th>Reference</th>
+                            <th>Room</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="reservations" t-as="res">
+                            <td t-esc="res.name"/>
+                            <td t-esc="res.room_id.name"/>
+                            <td t-esc="res.check_in"/>
+                            <td t-esc="res.check_out"/>
+                            <td t-esc="res.state"/>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+</odoo>

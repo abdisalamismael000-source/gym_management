@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Booking search + results -->
+    <template id="booking_page" name="Book a Room">
+        <t t-call="website.layout">
+            <div class="container my-5">
+                <h1 class="mb-4">Book Your Stay</h1>
+                <form action="/hotel/booking" method="get" class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">Check-in</label>
+                        <input type="date" name="check_in" class="form-control"
+                               t-att-value="check_in and check_in.strftime('%Y-%m-%d') or ''"
+                               t-att-min="today.strftime('%Y-%m-%d')"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Check-out</label>
+                        <input type="date" name="check_out" class="form-control"
+                               t-att-value="check_out and check_out.strftime('%Y-%m-%d') or ''"
+                               t-att-min="today.strftime('%Y-%m-%d')"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Guests</label>
+                        <input type="number" name="guests" min="1" class="form-control"
+                               t-att-value="guests"/>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </form>
+
+                <div t-if="error" class="alert alert-warning" t-esc="error"/>
+
+                <div t-if="results" class="row g-4">
+                    <t t-foreach="results" t-as="offer">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <img t-if="offer['room_type'].image"
+                                     t-att-src="image_data_uri(offer['room_type'].image)"
+                                     class="card-img-top" alt="Room"/>
+                                <div class="card-body">
+                                    <h5 class="card-title" t-esc="offer['room_type'].name"/>
+                                    <p class="text-muted mb-1">
+                                        Sleeps <t t-esc="offer['room_type'].capacity"/> ·
+                                        <t t-esc="offer['nights']"/> night(s)
+                                    </p>
+                                    <p class="fs-4 fw-bold">
+                                        <span t-esc="offer['total']"
+                                              t-options="{'widget': 'monetary', 'display_currency': offer['room_type'].currency_id}"/>
+                                    </p>
+                                    <form action="/hotel/booking/confirm" method="post">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="room_id" t-att-value="offer['room'].id"/>
+                                        <input type="hidden" name="check_in" t-att-value="check_in.strftime('%Y-%m-%d')"/>
+                                        <input type="hidden" name="check_out" t-att-value="check_out.strftime('%Y-%m-%d')"/>
+                                        <input type="hidden" name="guests" t-att-value="guests"/>
+                                        <div class="mb-2">
+                                            <input type="text" name="name" class="form-control"
+                                                   placeholder="Full name" required="required"/>
+                                        </div>
+                                        <div class="mb-2">
+                                            <input type="email" name="email" class="form-control"
+                                                   placeholder="Email" required="required"/>
+                                        </div>
+                                        <button type="submit" class="btn btn-success w-100">Book Now</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+                <div t-if="check_in and check_out and not results and not error"
+                     class="alert alert-info">
+                    No rooms available for those dates. Please try different dates.
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Our Rooms -->
+    <template id="rooms_page" name="Our Rooms">
+        <t t-call="website.layout">
+            <div class="container my-5">
+                <h1 class="mb-4">Our Rooms</h1>
+                <div class="row g-4">
+                    <t t-foreach="room_types" t-as="rt">
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <img t-if="rt.image" t-att-src="image_data_uri(rt.image)"
+                                     class="card-img-top" alt="Room"/>
+                                <div class="card-body">
+                                    <h5 class="card-title" t-esc="rt.name"/>
+                                    <p class="text-muted">Sleeps <t t-esc="rt.capacity"/></p>
+                                    <p class="fw-bold">
+                                        From
+                                        <span t-esc="rt.list_price"
+                                              t-options="{'widget': 'monetary', 'display_currency': rt.currency_id}"/>
+                                        / night
+                                    </p>
+                                    <div t-if="rt.amenity_ids" class="mb-2">
+                                        <span t-foreach="rt.amenity_ids" t-as="am"
+                                              class="badge text-bg-light me-1" t-esc="am.name"/>
+                                    </div>
+                                    <a href="/hotel/booking" class="btn btn-primary">Check Availability</a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Confirmation -->
+    <template id="booking_thanks" name="Booking Confirmed">
+        <t t-call="website.layout">
+            <div class="container my-5 text-center">
+                <h1 class="text-success"><i class="fa fa-check-circle me-2"/>Booking Confirmed</h1>
+                <p class="lead">Thank you, <t t-esc="reservation.partner_id.name"/>!</p>
+                <p>Your reference is <strong t-esc="reservation.name"/>.</p>
+                <p>
+                    Room <t t-esc="reservation.room_id.name"/>
+                    (<t t-esc="reservation.room_type_id.name"/>),
+                    <t t-esc="reservation.check_in"/> → <t t-esc="reservation.check_out"/>
+                </p>
+                <a href="/hotel/rooms" class="btn btn-secondary mt-3">Back to Rooms</a>
+            </div>
+        </t>
+    </template>
+
+    <!-- Error -->
+    <template id="booking_error" name="Booking Error">
+        <t t-call="website.layout">
+            <div class="container my-5 text-center">
+                <h1 class="text-danger">Booking could not be completed</h1>
+                <p class="lead" t-esc="message"/>
+                <a href="/hotel/booking" class="btn btn-primary mt-3">Try Again</a>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_config_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.hotel</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Hotel" name="zc_hotel"
+                     logo="/zc_hotel/static/description/icon.png">
+                    <block title="Billing" name="hotel_billing">
+                        <setting string="City / Tourism Tax"
+                                 help="Fixed tax added to each folio per night stayed.">
+                            <field name="hotel_city_tax_per_night"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_hotel_config_settings" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'zc_hotel'}</field>
+    </record>
+</odoo>

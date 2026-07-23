@@ -1,0 +1,33 @@
+.o_hotel_dashboard {
+    background-color: var(--o-webclient-background-color, #f8f9fa);
+    height: 100%;
+    overflow: auto;
+
+    .o_hotel_kpi {
+        .o_hotel_kpi_label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #6c757d;
+        }
+        .o_hotel_kpi_value {
+            font-size: 1.9rem;
+            font-weight: 600;
+        }
+    }
+
+    .o_hotel_tile {
+        cursor: pointer;
+        transition: box-shadow 0.15s ease-in-out;
+
+        &:hover {
+            box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12);
+        }
+
+        .o_hotel_tile_value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+    }
+}

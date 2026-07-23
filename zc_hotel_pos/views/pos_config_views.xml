@@ -16,6 +16,10 @@
                              help="Customer-account method that posts an order to the guest receivable.">
                         <field name="pos_hotel_folio_payment_method_id"/>
                     </setting>
+                    <setting string="Outlet Type"
+                             help="Categorises this outlet's charges on the guest folio.">
+                        <field name="pos_hotel_outlet_type"/>
+                    </setting>
                 </block>
             </xpath>
         </field>

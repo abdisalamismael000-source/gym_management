@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Amenities -->
+    <record id="amenity_wifi" model="hotel.amenity">
+        <field name="name">Free Wi-Fi</field>
+        <field name="icon">fa-wifi</field>
+    </record>
+    <record id="amenity_tv" model="hotel.amenity">
+        <field name="name">Smart TV</field>
+        <field name="icon">fa-tv</field>
+    </record>
+    <record id="amenity_ac" model="hotel.amenity">
+        <field name="name">Air Conditioning</field>
+        <field name="icon">fa-snowflake-o</field>
+    </record>
+    <record id="amenity_minibar" model="hotel.amenity">
+        <field name="name">Minibar</field>
+        <field name="icon">fa-glass</field>
+    </record>
+    <record id="amenity_safe" model="hotel.amenity">
+        <field name="name">In-room Safe</field>
+        <field name="icon">fa-lock</field>
+    </record>
+
+    <!-- Room-night service products -->
+    <record id="product_standard_night" model="product.product">
+        <field name="name">Standard Room Night</field>
+        <field name="type">service</field>
+        <field name="list_price">80.0</field>
+    </record>
+    <record id="product_deluxe_night" model="product.product">
+        <field name="name">Deluxe Room Night</field>
+        <field name="type">service</field>
+        <field name="list_price">130.0</field>
+    </record>
+    <record id="product_suite_night" model="product.product">
+        <field name="name">Suite Night</field>
+        <field name="type">service</field>
+        <field name="list_price">220.0</field>
+    </record>
+
+    <!-- Room types -->
+    <record id="room_type_standard" model="hotel.room.type">
+        <field name="name">Standard</field>
+        <field name="code">STD</field>
+        <field name="capacity">2</field>
+        <field name="list_price">80.0</field>
+        <field name="product_id" ref="product_standard_night"/>
+        <field name="amenity_ids" eval="[(6, 0, [ref('amenity_wifi'), ref('amenity_tv'), ref('amenity_ac')])]"/>
+    </record>
+    <record id="room_type_deluxe" model="hotel.room.type">
+        <field name="name">Deluxe</field>
+        <field name="code">DLX</field>
+        <field name="capacity">3</field>
+        <field name="list_price">130.0</field>
+        <field name="product_id" ref="product_deluxe_night"/>
+        <field name="amenity_ids" eval="[(6, 0, [ref('amenity_wifi'), ref('amenity_tv'), ref('amenity_ac'), ref('amenity_minibar')])]"/>
+    </record>
+    <record id="room_type_suite" model="hotel.room.type">
+        <field name="name">Suite</field>
+        <field name="code">STE</field>
+        <field name="capacity">4</field>
+        <field name="list_price">220.0</field>
+        <field name="product_id" ref="product_suite_night"/>
+        <field name="amenity_ids" eval="[(6, 0, [ref('amenity_wifi'), ref('amenity_tv'), ref('amenity_ac'), ref('amenity_minibar'), ref('amenity_safe')])]"/>
+    </record>
+
+    <!-- Rooms -->
+    <record id="room_101" model="hotel.room">
+        <field name="name">101</field><field name="floor">1</field>
+        <field name="room_type_id" ref="room_type_standard"/>
+    </record>
+    <record id="room_102" model="hotel.room">
+        <field name="name">102</field><field name="floor">1</field>
+        <field name="room_type_id" ref="room_type_standard"/>
+    </record>
+    <record id="room_103" model="hotel.room">
+        <field name="name">103</field><field name="floor">1</field>
+        <field name="room_type_id" ref="room_type_standard"/>
+    </record>
+    <record id="room_201" model="hotel.room">
+        <field name="name">201</field><field name="floor">2</field>
+        <field name="room_type_id" ref="room_type_deluxe"/>
+    </record>
+    <record id="room_202" model="hotel.room">
+        <field name="name">202</field><field name="floor">2</field>
+        <field name="room_type_id" ref="room_type_deluxe"/>
+    </record>
+    <record id="room_203" model="hotel.room">
+        <field name="name">203</field><field name="floor">2</field>
+        <field name="room_type_id" ref="room_type_deluxe"/>
+    </record>
+    <record id="room_301" model="hotel.room">
+        <field name="name">301</field><field name="floor">3</field>
+        <field name="room_type_id" ref="room_type_suite"/>
+    </record>
+    <record id="room_302" model="hotel.room">
+        <field name="name">302</field><field name="floor">3</field>
+        <field name="room_type_id" ref="room_type_suite"/>
+    </record>
+
+    <!-- Seasonal rate plan (high season) -->
+    <record id="rate_deluxe_high" model="hotel.rate.plan">
+        <field name="name">Deluxe — High Season</field>
+        <field name="room_type_id" ref="room_type_deluxe"/>
+        <field name="date_start" eval="(DateTime.today()).strftime('%Y-%m-01')"/>
+        <field name="date_end" eval="(DateTime.today() + relativedelta(months=2)).strftime('%Y-%m-28')"/>
+        <field name="price">160.0</field>
+        <field name="board_type">bb</field>
+    </record>
+
+    <!-- Guests -->
+    <record id="guest_john" model="res.partner">
+        <field name="name">John Carter</field>
+        <field name="is_hotel_guest">True</field>
+        <field name="email">john.carter@example.com</field>
+        <field name="id_type">passport</field>
+        <field name="id_number">X1234567</field>
+    </record>
+    <record id="guest_maria" model="res.partner">
+        <field name="name">Maria Lopez</field>
+        <field name="is_hotel_guest">True</field>
+        <field name="email">maria.lopez@example.com</field>
+        <field name="vip">True</field>
+    </record>
+
+    <!-- Sample reservations -->
+    <record id="reservation_demo_1" model="hotel.reservation">
+        <field name="partner_id" ref="guest_john"/>
+        <field name="room_id" ref="room_201"/>
+        <field name="check_in" eval="DateTime.today().strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="adults">2</field>
+        <field name="board_type">bb</field>
+        <field name="state">confirmed</field>
+        <field name="source">website</field>
+    </record>
+    <record id="reservation_demo_2" model="hotel.reservation">
+        <field name="partner_id" ref="guest_maria"/>
+        <field name="room_id" ref="room_301"/>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=5)).strftime('%Y-%m-%d')"/>
+        <field name="adults">2</field>
+        <field name="children">1</field>
+        <field name="state">confirmed</field>
+        <field name="source">direct</field>
+    </record>
+</odoo>

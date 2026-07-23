@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_folio_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="folio">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Guest Folio <span t-field="folio.name"/></h2>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <strong>Guest:</strong> <span t-field="folio.partner_id"/><br/>
+                                <strong>Room:</strong> <span t-field="folio.room_id"/><br/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Status:</strong> <span t-field="folio.state"/><br/>
+                                <t t-if="folio.reservation_id">
+                                    <strong>Stay:</strong>
+                                    <span t-field="folio.reservation_id.check_in"/> →
+                                    <span t-field="folio.reservation_id.check_out"/>
+                                </t>
+                            </div>
+                        </div>
+                        <table class="table table-sm mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="folio.charge_line_ids" t-as="line">
+                                    <td><span t-field="line.date"/></td>
+                                    <td><span t-field="line.charge_type"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="text-end"><span t-field="line.quantity"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row justify-content-end">
+                            <div class="col-4">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td>Total</td>
+                                        <td class="text-end"><span t-field="folio.amount_total"/></td>
+                                    </tr>
+                                    <tr t-if="folio.deposit_amount">
+                                        <td>Deposit</td>
+                                        <td class="text-end"><span t-field="folio.deposit_amount"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Invoiced</td>
+                                        <td class="text-end"><span t-field="folio.amount_invoiced"/></td>
+                                    </tr>
+                                    <tr class="fw-bold">
+                                        <td>Balance Due</td>
+                                        <td class="text-end"><span t-field="folio.balance_due"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

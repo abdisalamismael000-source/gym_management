@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_room_availability_wizard_form" model="ir.ui.view">
+        <field name="name">hotel.room.availability.wizard.form</field>
+        <field name="model">hotel.room.availability.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Check Availability">
+                <group>
+                    <group>
+                        <field name="check_in"/>
+                        <field name="check_out"/>
+                    </group>
+                    <group>
+                        <field name="room_type_id"/>
+                        <field name="partner_id"/>
+                        <field name="available_count"/>
+                    </group>
+                </group>
+                <field name="available_room_ids">
+                    <list>
+                        <field name="name"/>
+                        <field name="room_type_id"/>
+                        <field name="floor"/>
+                        <field name="capacity"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_create_reservation" type="object"
+                            string="Create Reservation" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_room_availability_wizard" model="ir.actions.act_window">
+        <field name="name">Check Availability</field>
+        <field name="res_model">hotel.room.availability.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

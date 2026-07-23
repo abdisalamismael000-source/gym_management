@@ -25,12 +25,16 @@ class HotelFolio(models.Model):
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id = fields.Many2one(
         'res.currency', default=lambda self: self.env.company.currency_id)
+    deposit_amount = fields.Monetary(
+        related='reservation_id.deposit_amount', string='Deposit', store=True)
     amount_total = fields.Monetary(compute='_compute_amounts', store=True)
     amount_invoiced = fields.Monetary(compute='_compute_amounts', store=True)
     amount_due = fields.Monetary(compute='_compute_amounts', store=True)
+    balance_due = fields.Monetary(
+        compute='_compute_amounts', store=True, string='Balance (net of deposit)')
 
     @api.depends('charge_line_ids.price_subtotal', 'move_ids.amount_total',
-                 'move_ids.payment_state')
+                 'move_ids.payment_state', 'deposit_amount')
     def _compute_amounts(self):
         for folio in self:
             total = sum(folio.charge_line_ids.mapped('price_subtotal'))
@@ -39,6 +43,7 @@ class HotelFolio(models.Model):
             folio.amount_total = total
             folio.amount_invoiced = invoiced
             folio.amount_due = total - invoiced
+            folio.balance_due = total - invoiced - folio.deposit_amount
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -54,17 +59,33 @@ class HotelFolio(models.Model):
         if not room_type.product_id:
             raise UserError((
                 "Room type %s has no room-night product configured.") % room_type.name)
+        # Avoid charging the room twice if check-in is triggered again.
+        if self.charge_line_ids.filtered(lambda l: l.charge_type == 'room'):
+            return
+        nights = reservation.nights or 1
+        rate = self.env['hotel.rate.plan']._get_average_rate(
+            room_type, reservation.check_in, reservation.check_out) or room_type.list_price
         self.env['hotel.folio.line'].create({
             'folio_id': self.id,
             'product_id': room_type.product_id.id,
             'name': ("Room %(room)s — %(nights)s night(s)") % {
                 'room': reservation.room_id.name,
-                'nights': reservation.nights,
+                'nights': nights,
             },
-            'quantity': reservation.nights or 1,
-            'price_unit': room_type.list_price,
+            'quantity': nights,
+            'price_unit': rate,
             'charge_type': 'room',
         })
+        # City / tourism tax per night, if configured on the company.
+        tax_per_night = self.company_id.hotel_city_tax_per_night
+        if tax_per_night:
+            self.env['hotel.folio.line'].create({
+                'folio_id': self.id,
+                'name': "City Tax — %(nights)s night(s)" % {'nights': nights},
+                'quantity': nights,
+                'price_unit': tax_per_night,
+                'charge_type': 'tax',
+            })
 
     def action_close(self):
         self.write({'state': 'checked_out'})
@@ -117,8 +138,12 @@ class HotelFolioLine(models.Model):
     charge_type = fields.Selection([
         ('room', 'Room'),
         ('restaurant', 'Restaurant'),
+        ('bar', 'Bar'),
+        ('spa', 'Spa'),
         ('minibar', 'Minibar'),
+        ('laundry', 'Laundry'),
         ('service', 'Service'),
+        ('tax', 'Tax / Levy'),
         ('other', 'Other'),
     ], default='other', required=True)
 

@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_hotel_root" name="Hotel" sequence="45"
-              web_icon="account,static/description/icon.png"/>
+              web_icon="zc_hotel,static/description/icon.png"/>
 
+    <!-- Front Desk dashboard -->
+    <menuitem id="menu_hotel_dashboard" name="Front Desk"
+              parent="menu_hotel_root" action="action_hotel_dashboard"
+              sequence="1"/>
+
+    <!-- Operations -->
     <menuitem id="menu_hotel_operations" name="Operations"
               parent="menu_hotel_root" sequence="10"/>
     <menuitem id="menu_hotel_reservation" name="Reservations"
               parent="menu_hotel_operations" action="action_hotel_reservation"
               sequence="10"/>
+    <menuitem id="menu_hotel_availability" name="Check Availability"
+              parent="menu_hotel_operations" action="action_room_availability_wizard"
+              sequence="15"/>
     <menuitem id="menu_hotel_folio" name="Folios"
               parent="menu_hotel_operations" action="action_hotel_folio"
               sequence="20"/>
+    <menuitem id="menu_hotel_housekeeping" name="Housekeeping"
+              parent="menu_hotel_operations" action="action_hotel_housekeeping"
+              sequence="30"/>
+    <menuitem id="menu_hotel_rooms_board" name="Rooms Board"
+              parent="menu_hotel_operations" action="action_hotel_room"
+              sequence="40"/>
 
+    <!-- Guests -->
+    <menuitem id="menu_hotel_guests" name="Guests"
+              parent="menu_hotel_root" sequence="20"/>
+    <menuitem id="menu_hotel_guest_list" name="Guests"
+              parent="menu_hotel_guests" action="action_hotel_guest"
+              sequence="10"/>
+
+    <!-- Reporting -->
+    <menuitem id="menu_hotel_reporting" name="Reporting"
+              parent="menu_hotel_root" sequence="30"/>
+    <menuitem id="menu_hotel_reports" name="Reports"
+              parent="menu_hotel_reporting" action="action_hotel_report_wizard"
+              sequence="10"/>
+    <menuitem id="menu_hotel_reservation_analysis" name="Reservation Analysis"
+              parent="menu_hotel_reporting" action="action_hotel_reservation"
+              sequence="20"/>
+
+    <!-- Configuration -->
     <menuitem id="menu_hotel_config" name="Configuration"
               parent="menu_hotel_root" sequence="90"
               groups="group_hotel_manager"/>
@@ -19,4 +52,11 @@
               parent="menu_hotel_config" action="action_hotel_room" sequence="10"/>
     <menuitem id="menu_hotel_room_type" name="Room Types"
               parent="menu_hotel_config" action="action_hotel_room_type" sequence="20"/>
+    <menuitem id="menu_hotel_rate_plan" name="Rate Plans"
+              parent="menu_hotel_config" action="action_hotel_rate_plan" sequence="30"/>
+    <menuitem id="menu_hotel_amenity" name="Amenities"
+              parent="menu_hotel_config" action="action_hotel_amenity" sequence="40"/>
+    <menuitem id="menu_hotel_settings" name="Settings"
+              parent="menu_hotel_config" action="action_hotel_config_settings"
+              sequence="90"/>
 </odoo>

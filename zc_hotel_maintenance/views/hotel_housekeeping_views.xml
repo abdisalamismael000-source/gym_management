@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_housekeeping_form_maintenance" model="ir.ui.view">
+        <field name="name">hotel.housekeeping.form.maintenance</field>
+        <field name="model">hotel.housekeeping</field>
+        <field name="inherit_id" ref="zc_hotel.view_hotel_housekeeping_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="before">
+                <button name="action_report_issue" type="object"
+                        string="Report Maintenance Issue"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

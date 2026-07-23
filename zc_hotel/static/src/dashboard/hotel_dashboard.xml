@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="zc_hotel.HotelDashboard">
+        <div class="o_hotel_dashboard p-3">
+            <div t-if="state.loading" class="text-center p-5">
+                <i class="fa fa-spinner fa-spin fa-2x"/>
+            </div>
+            <div t-else="">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="mb-0">Front Desk</h2>
+                    <button class="btn btn-secondary btn-sm" t-on-click="() => this.loadData()">
+                        <i class="fa fa-refresh me-1"/> Refresh
+                    </button>
+                </div>
+
+                <!-- KPI row -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3 col-6">
+                        <div class="o_hotel_kpi card h-100">
+                            <div class="card-body">
+                                <div class="o_hotel_kpi_label">Occupancy</div>
+                                <div class="o_hotel_kpi_value"><t t-esc="state.data.occupancy_rate"/>%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="o_hotel_kpi card h-100">
+                            <div class="card-body">
+                                <div class="o_hotel_kpi_label">ADR</div>
+                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.adr)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="o_hotel_kpi card h-100">
+                            <div class="card-body">
+                                <div class="o_hotel_kpi_label">RevPAR</div>
+                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.revpar)"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="o_hotel_kpi card h-100">
+                            <div class="card-body">
+                                <div class="o_hotel_kpi_label">Revenue (MTD)</div>
+                                <div class="o_hotel_kpi_value" t-esc="formatMoney(state.data.total_revenue)"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movements -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4 col-6">
+                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openArrivals()">
+                            <div class="card-body text-center">
+                                <div class="o_hotel_tile_value text-primary"><t t-esc="state.data.arrivals"/></div>
+                                <div>Arrivals Today</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openDepartures()">
+                            <div class="card-body text-center">
+                                <div class="o_hotel_tile_value text-warning"><t t-esc="state.data.departures"/></div>
+                                <div>Departures Today</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-6">
+                        <div class="o_hotel_tile card h-100" t-on-click="() => this.openInHouse()">
+                            <div class="card-body text-center">
+                                <div class="o_hotel_tile_value text-success"><t t-esc="state.data.in_house"/></div>
+                                <div>In House</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room status -->
+                <div class="row g-3">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Room Status</h5>
+                                <table class="table table-sm mb-0">
+                                    <tbody>
+                                        <tr><td>Available</td><td class="text-end"><t t-esc="state.data.available_rooms"/></td></tr>
+                                        <tr><td>Occupied</td><td class="text-end"><t t-esc="state.data.occupied_rooms"/></td></tr>
+                                        <tr><td>Needs Cleaning</td><td class="text-end"><t t-esc="state.data.dirty_rooms"/></td></tr>
+                                        <tr><td>Out of Service</td><td class="text-end"><t t-esc="state.data.out_of_service"/></td></tr>
+                                        <tr class="fw-bold"><td>Total Rooms</td><td class="text-end"><t t-esc="state.data.sellable_rooms"/></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

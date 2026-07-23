@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_hotel_guest" model="ir.ui.view">
+        <field name="name">res.partner.form.hotel.guest</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_guest_reservations" type="object"
+                        class="oe_stat_button" icon="fa-bed"
+                        invisible="not is_hotel_guest">
+                    <field name="reservation_count" widget="statinfo" string="Reservations"/>
+                </button>
+            </xpath>
+            <notebook position="inside">
+                <page string="Hotel Guest" name="hotel_guest"
+                      invisible="not is_hotel_guest and not is_corporate_account">
+                    <group>
+                        <group string="Identity">
+                            <field name="id_type"/>
+                            <field name="id_number"/>
+                            <field name="nationality_id"/>
+                            <field name="date_of_birth"/>
+                        </group>
+                        <group string="Guest Profile">
+                            <field name="vip"/>
+                            <field name="loyalty_points"/>
+                            <field name="stay_count"/>
+                        </group>
+                    </group>
+                    <group string="Preferences">
+                        <field name="guest_preferences" nolabel="1"/>
+                    </group>
+                </page>
+            </notebook>
+            <field name="category_id" position="before">
+                <field name="is_hotel_guest"/>
+                <field name="is_corporate_account"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="action_hotel_guest" model="ir.actions.act_window">
+        <field name="name">Guests</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_hotel_guest', '=', True)]</field>
+        <field name="context">{'default_is_hotel_guest': True}</field>
+    </record>
+</odoo>
