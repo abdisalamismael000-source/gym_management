@@ -49,7 +49,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Charges">
+                        <page string="Charges" name="charges">
                             <field name="charge_line_ids">
                                 <list editable="bottom">
                                     <field name="date"/>
@@ -63,7 +63,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Invoices">
+                        <page string="Invoices" name="invoices">
                             <field name="move_ids"/>
                         </page>
                     </notebook>
