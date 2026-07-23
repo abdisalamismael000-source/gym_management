@@ -176,12 +176,11 @@
                 <separator/>
                 <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
                 <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
-                    <filter name="group_room_type" string="Room Type"
-                            context="{'group_by':'room_type_id'}"/>
-                    <filter name="group_source" string="Source" context="{'group_by':'source'}"/>
-                </group>
+                <separator/>
+                <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                <filter name="group_room_type" string="Room Type"
+                        context="{'group_by':'room_type_id'}"/>
+                <filter name="group_source" string="Source" context="{'group_by':'source'}"/>
             </search>
         </field>
     </record>
