@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_folio_pos_user,hotel.folio.pos.user,zc_hotel.model_hotel_folio,point_of_sale.group_pos_user,1,1,1,0
+access_folio_line_pos_user,hotel.folio.line.pos.user,zc_hotel.model_hotel_folio_line,point_of_sale.group_pos_user,1,1,1,0

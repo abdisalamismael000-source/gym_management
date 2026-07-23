@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_hotel_pos" model="ir.ui.view">
+        <field name="name">res.config.settings.hotel.pos</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pos_payments_section']" position="after">
+                <block title="Hotel Folio" id="hotel_folio_section">
+                    <setting string="Charge Mode"
+                             help="How POS orders connect to a hotel guest.">
+                        <field name="pos_hotel_charge_mode"/>
+                    </setting>
+                    <setting string="Room Folio Payment Method"
+                             invisible="pos_hotel_charge_mode != 'folio'"
+                             help="Customer-account method that posts an order to the guest receivable.">
+                        <field name="pos_hotel_folio_payment_method_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

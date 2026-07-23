@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hotel_root" name="Hotel" sequence="45"
+              web_icon="account,static/description/icon.png"/>
+
+    <menuitem id="menu_hotel_operations" name="Operations"
+              parent="menu_hotel_root" sequence="10"/>
+    <menuitem id="menu_hotel_reservation" name="Reservations"
+              parent="menu_hotel_operations" action="action_hotel_reservation"
+              sequence="10"/>
+    <menuitem id="menu_hotel_folio" name="Folios"
+              parent="menu_hotel_operations" action="action_hotel_folio"
+              sequence="20"/>
+
+    <menuitem id="menu_hotel_config" name="Configuration"
+              parent="menu_hotel_root" sequence="90"
+              groups="group_hotel_manager"/>
+    <menuitem id="menu_hotel_room" name="Rooms"
+              parent="menu_hotel_config" action="action_hotel_room" sequence="10"/>
+    <menuitem id="menu_hotel_room_type" name="Room Types"
+              parent="menu_hotel_config" action="action_hotel_room_type" sequence="20"/>
+</odoo>

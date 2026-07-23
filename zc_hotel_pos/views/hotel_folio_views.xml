@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_folio_form_pos" model="ir.ui.view">
+        <field name="name">hotel.folio.form.pos</field>
+        <field name="model">hotel.folio</field>
+        <field name="inherit_id" ref="zc_hotel.view_hotel_folio_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@string='Invoices']" position="before">
+                <page string="POS Orders">
+                    <field name="pos_order_ids">
+                        <list>
+                            <field name="name"/>
+                            <field name="date_order"/>
+                            <field name="amount_total"/>
+                            <field name="state"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="zc_hotel_pos.ChargeToRoomButton">
+        <button class="control-button btn btn-light rounded-0 fw-bolder"
+                t-on-click="onClick">
+            <i class="fa fa-bed me-1" role="img" aria-label="Charge to room"/>
+            <span t-if="currentFolioName">
+                Room: <t t-esc="currentFolioName"/>
+            </span>
+            <span t-else="">Charge to Room</span>
+        </button>
+    </t>
+
+    <t t-name="zc_hotel_pos.FolioSelectDialog">
+        <Dialog title="dialogTitle" size="'md'">
+            <div class="folio-select">
+                <input type="text" class="form-control mb-2"
+                       placeholder="Search guest, room or reference"
+                       t-model="state.query"/>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Guest</th>
+                            <th>Room</th>
+                            <th>Folio</th>
+                            <th class="text-end">Due</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="filteredFolios" t-as="folio" t-key="folio.id"
+                            t-on-click="() => this.selectFolio(folio)"
+                            style="cursor: pointer;">
+                            <td t-esc="folio.partner_id and folio.partner_id[1]"/>
+                            <td t-esc="folio.room_id and folio.room_id[1]"/>
+                            <td t-esc="folio.name"/>
+                            <td class="text-end" t-esc="folio.amount_due"/>
+                        </tr>
+                        <tr t-if="!filteredFolios.length">
+                            <td colspan="4" class="text-center text-muted">
+                                No matching folios.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </Dialog>
+    </t>
+
+</templates>

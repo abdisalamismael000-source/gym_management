@@ -1,0 +1,20 @@
+{
+    'name': 'Hotel Management',
+    'version': '19.0.1.0.0',
+    'category': 'Services/Hotel',
+    'summary': 'Rooms, reservations, check-in/out and guest folios',
+    'author': 'Zenith Consulting',
+    'license': 'LGPL-3',
+    'depends': ['base', 'account', 'product'],
+    'data': [
+        'security/hotel_security.xml',
+        'security/ir.model.access.csv',
+        'data/ir_sequence.xml',
+        'views/hotel_room_views.xml',
+        'views/hotel_reservation_views.xml',
+        'views/hotel_folio_views.xml',
+        'views/hotel_menus.xml',
+    ],
+    'installable': True,
+    'application': True,
+}

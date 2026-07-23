@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_reservation_list" model="ir.ui.view">
+        <field name="name">hotel.reservation.list</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'checked_in'"
+                  decoration-muted="state in ('checked_out','cancelled')">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="room_id"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="nights"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_form" model="ir.ui.view">
+        <field name="name">hotel.reservation.form</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" type="object" string="Confirm"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_check_in" type="object" string="Check In"
+                            class="btn-primary"
+                            invisible="state not in ('draft','confirmed')"/>
+                    <button name="action_check_out" type="object" string="Check Out"
+                            class="btn-primary" invisible="state != 'checked_in'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('checked_out','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,checked_in,checked_out"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="folio_id" type="object" class="oe_stat_button"
+                                icon="fa-book" invisible="not folio_id"
+                                context="{'default_folio': folio_id}">
+                            <field name="folio_id" widget="statinfo" string="Folio"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="room_id"/>
+                            <field name="room_type_id"/>
+                        </group>
+                        <group>
+                            <field name="check_in"/>
+                            <field name="check_out"/>
+                            <field name="nights"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_reservation" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">hotel.reservation</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
