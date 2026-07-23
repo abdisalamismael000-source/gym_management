@@ -44,9 +44,21 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          path: extra-addons
+          path: repo
 
-      - name: Install modules with tests enabled
+      - name: Stage modules into the addons path
+        # $GITHUB_WORKSPACE resolves correctly *inside* the container, unlike the
+        # ${{ github.workspace }} expression which yields the host path.
+        run: |
+          set -e
+          mkdir -p /mnt/extra-addons
+          cp -r "$GITHUB_WORKSPACE/repo/." /mnt/extra-addons/
+
+      - name: Install modules and run this repo's tests
+        # Install validates every module (and its dependencies: account, stock,
+        # website, point_of_sale, maintenance, hr...). --test-tags scopes the
+        # test run to THIS repo's modules so the flaky, browser-dependent core
+        # test suite does not run in a headless CI container.
         run: |
           set -e
           odoo \
@@ -58,7 +70,8 @@ jobs:
             -w odoo \
             -d ci_test \
             --data-dir=/tmp/odoo-data \
-            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,${{ github.workspace }}/extra-addons \
+            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             -i zc_hotel,zc_hotel_pos,zc_hotel_maintenance,zc_hotel_website,zc_hotel_event \
             --test-enable \
+            --test-tags=/zc_hotel,/zc_hotel_pos,/zc_hotel_maintenance,/zc_hotel_website,/zc_hotel_event \
             --log-level=test
