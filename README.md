@@ -69,6 +69,29 @@ nightly reports.
 4. Install with demo data to explore a pre-populated hotel (room types, rooms,
    amenities, rate plans, guests and sample reservations).
 
+## Run locally (Docker)
+
+The fastest way to try it on your own machine. From the repo root:
+
+```bash
+docker compose up -d
+```
+
+Then open <http://localhost:8069>, create a database, and install **Hotel
+Management** from the Apps list (enable Developer Mode → *Update Apps List* if
+the modules don't show up right away). Install the optional add-ons
+(`zc_hotel_pos`, `zc_hotel_website`, `zc_hotel_maintenance`, `zc_hotel_event`)
+from the same list. The suite is validated on this exact stack (Odoo 19 +
+PostgreSQL 16) by the CI workflow in `.github/workflows/ci.yml`.
+
+To stop: `docker compose down` (add `-v` to also wipe the database volume).
+
+### Without Docker
+
+Copy the five module folders into your Odoo 19 `addons` path (or add this repo
+folder to `addons_path` in `odoo.conf`), restart Odoo, update the Apps list, and
+install **Hotel Management**.
+
 ## Quick start
 
 1. **Front Desk** → review the dashboard KPIs.
