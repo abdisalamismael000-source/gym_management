@@ -8,3 +8,5 @@ class ResConfigSettings(models.TransientModel):
         related='pos_config_id.hotel_charge_mode', readonly=False)
     pos_hotel_folio_payment_method_id = fields.Many2one(
         related='pos_config_id.hotel_folio_payment_method_id', readonly=False)
+    pos_hotel_outlet_type = fields.Selection(
+        related='pos_config_id.hotel_outlet_type', readonly=False)

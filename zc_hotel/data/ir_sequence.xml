@@ -13,4 +13,11 @@
         <field name="prefix">FOL/%(year)s/</field>
         <field name="padding">4</field>
     </record>
+
+    <record id="seq_hotel_service_booking" model="ir.sequence">
+        <field name="name">Hotel Service Booking</field>
+        <field name="code">hotel.service.booking</field>
+        <field name="prefix">SRV/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
 </odoo>

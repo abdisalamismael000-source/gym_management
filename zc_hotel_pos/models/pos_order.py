@@ -15,9 +15,13 @@ class PosOrder(models.Model):
         return fields_
 
     def _create_folio_charges(self):
-        """Copy this order's lines onto the linked folio as restaurant charges."""
+        """Copy this order's lines onto the linked folio, tagged by outlet."""
         FolioLine = self.env['hotel.folio.line']
         for order in self.filtered('folio_id'):
+            # Outlet type on the POS drives the folio charge category.
+            charge_type = order.config_id.hotel_outlet_type or 'restaurant'
+            if charge_type == 'other':
+                charge_type = 'service'
             # Avoid duplicating charges if the order is processed twice.
             existing = FolioLine.search([('pos_order_line_id', 'in', order.lines.ids)])
             charged_lines = existing.mapped('pos_order_line_id')
@@ -29,7 +33,7 @@ class PosOrder(models.Model):
                     'quantity': line.qty,
                     'price_unit': line.price_unit,
                     'tax_ids': [(6, 0, line.tax_ids.ids)],
-                    'charge_type': 'restaurant',
+                    'charge_type': charge_type,
                     'pos_order_line_id': line.id,
                 })
 

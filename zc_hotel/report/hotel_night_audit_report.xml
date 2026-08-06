@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_night_audit_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="data" t-value="doc.get_report_values()"/>
+                <t t-set="rtype" t-value="data.get('rtype')"/>
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2><span t-field="doc.report_type"/></h2>
+                        <p class="text-muted">
+                            <span t-field="doc.date_from"/> — <span t-field="doc.date_to"/>
+                        </p>
+
+                        <!-- Manager Flash / Occupancy -->
+                        <t t-if="rtype == 'flash' or rtype == 'occupancy'">
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <table class="table table-sm">
+                                        <tr><td>Total Rooms</td><td class="text-end" t-esc="data['total_rooms']"/></tr>
+                                        <tr><td>Occupied</td><td class="text-end" t-esc="data['occupied']"/></tr>
+                                        <tr><td>Available</td><td class="text-end" t-esc="data['available']"/></tr>
+                                        <tr><td>Needs Cleaning</td><td class="text-end" t-esc="data['dirty']"/></tr>
+                                        <tr><td>Out of Service</td><td class="text-end" t-esc="data['out_of_service']"/></tr>
+                                        <tr><td>No-shows</td><td class="text-end" t-esc="data['no_shows']"/></tr>
+                                    </table>
+                                </div>
+                                <div class="col-6">
+                                    <table class="table table-sm">
+                                        <tr><td>Occupancy %</td><td class="text-end" t-esc="data['occupancy']"/></tr>
+                                        <tr><td>ADR</td><td class="text-end" t-esc="data['adr']"/></tr>
+                                        <tr><td>RevPAR</td><td class="text-end" t-esc="data['revpar']"/></tr>
+                                        <tr><td>Room Revenue</td><td class="text-end" t-esc="data['room_revenue']"/></tr>
+                                        <tr><td>POS Revenue</td><td class="text-end" t-esc="data['pos_revenue']"/></tr>
+                                        <tr class="fw-bold"><td>Total Revenue</td><td class="text-end" t-esc="data['total_revenue']"/></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Reservation lists -->
+                        <t t-if="rtype in ('arrivals','departures','in_house','no_show','police')">
+                            <table class="table table-sm mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>Reference</th>
+                                        <th>Guest</th>
+                                        <th>Room</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="data.get('reservations', [])" t-as="r">
+                                        <td><span t-field="r.name"/></td>
+                                        <td><span t-field="r.partner_id"/></td>
+                                        <td><span t-field="r.room_id"/></td>
+                                        <td><span t-field="r.check_in"/></td>
+                                        <td><span t-field="r.check_out"/></td>
+                                        <td><span t-field="r.state"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Room / Housekeeping status -->
+                        <t t-if="rtype == 'room_status'">
+                            <table class="table table-sm mt-3">
+                                <thead>
+                                    <tr><th>Room</th><th>Type</th><th>Floor</th><th>Status</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="data.get('rooms', [])" t-as="room">
+                                        <td><span t-field="room.name"/></td>
+                                        <td><span t-field="room.room_type_id"/></td>
+                                        <td><span t-field="room.floor"/></td>
+                                        <td><span t-field="room.state"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Guest ledger -->
+                        <t t-if="rtype == 'guest_ledger'">
+                            <table class="table table-sm mt-3">
+                                <thead>
+                                    <tr><th>Folio</th><th>Guest</th><th class="text-end">Total</th><th class="text-end">Due</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="data.get('folios', [])" t-as="f">
+                                        <td><span t-field="f.name"/></td>
+                                        <td><span t-field="f.partner_id"/></td>
+                                        <td class="text-end"><span t-field="f.amount_total"/></td>
+                                        <td class="text-end"><span t-field="f.amount_due"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <!-- Revenue by room type -->
+                        <t t-if="rtype == 'revenue_type'">
+                            <table class="table table-sm mt-3">
+                                <thead>
+                                    <tr><th>Room Type</th><th class="text-end">Room-nights</th><th class="text-end">Revenue</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="data.get('revenue_rows', {}).items()" t-as="row">
+                                        <td t-esc="row[0]"/>
+                                        <td class="text-end" t-esc="row[1]['nights']"/>
+                                        <td class="text-end" t-esc="row[1]['revenue']"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

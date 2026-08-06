@@ -5,8 +5,8 @@
         <field name="model">hotel.folio</field>
         <field name="inherit_id" ref="zc_hotel.view_hotel_folio_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@string='Invoices']" position="before">
-                <page string="POS Orders">
+            <xpath expr="//page[@name='invoices']" position="before">
+                <page string="POS Orders" name="pos_orders">
                     <field name="pos_order_ids">
                         <list>
                             <field name="name"/>

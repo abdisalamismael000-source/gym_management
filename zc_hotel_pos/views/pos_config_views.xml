@@ -5,7 +5,7 @@
         <field name="model">res.config.settings</field>
         <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//block[@id='pos_payments_section']" position="after">
+            <xpath expr="//app[@name='point_of_sale']" position="inside">
                 <block title="Hotel Folio" id="hotel_folio_section">
                     <setting string="Charge Mode"
                              help="How POS orders connect to a hotel guest.">
@@ -15,6 +15,10 @@
                              invisible="pos_hotel_charge_mode != 'folio'"
                              help="Customer-account method that posts an order to the guest receivable.">
                         <field name="pos_hotel_folio_payment_method_id"/>
+                    </setting>
+                    <setting string="Outlet Type"
+                             help="Categorises this outlet's charges on the guest folio.">
+                        <field name="pos_hotel_outlet_type"/>
                     </setting>
                 </block>
             </xpath>

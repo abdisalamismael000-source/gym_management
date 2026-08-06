@@ -24,6 +24,8 @@
                     <button name="action_invoice" type="object"
                             string="Invoice Folio" class="btn-primary"
                             invisible="state in ('invoiced','closed') or amount_total == 0"/>
+                    <button name="%(action_report_folio)d" type="action"
+                            string="Print Folio"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,open,checked_out,invoiced"/>
                 </header>
@@ -38,14 +40,16 @@
                             <field name="room_id"/>
                         </group>
                         <group>
+                            <field name="deposit_amount"/>
                             <field name="amount_total"/>
                             <field name="amount_invoiced"/>
                             <field name="amount_due"/>
+                            <field name="balance_due"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Charges">
+                        <page string="Charges" name="charges">
                             <field name="charge_line_ids">
                                 <list editable="bottom">
                                     <field name="date"/>
@@ -59,7 +63,7 @@
                                 </list>
                             </field>
                         </page>
-                        <page string="Invoices">
+                        <page string="Invoices" name="invoices">
                             <field name="move_ids"/>
                         </page>
                     </notebook>

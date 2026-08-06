@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_service_list" model="ir.ui.view">
+        <field name="name">hotel.service.booking.list</field>
+        <field name="model">hotel.service.booking</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state in ('done','cancelled')">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="service_type"/>
+                <field name="scheduled_date"/>
+                <field name="employee_id"/>
+                <field name="price_unit"/>
+                <field name="charged"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_hotel_service_form" model="ir.ui.view">
+        <field name="name">hotel.service.booking.form</field>
+        <field name="model">hotel.service.booking</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_book" type="object" string="Book"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_done" type="object" string="Mark Done &amp; Charge"
+                            class="btn-primary" invisible="state != 'booked'"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state in ('done','cancelled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,booked,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="reservation_id"/>
+                            <field name="folio_id"/>
+                            <field name="service_type"/>
+                        </group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="employee_id"/>
+                            <field name="scheduled_date"/>
+                            <field name="quantity"/>
+                            <field name="price_unit"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="charged"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hotel_service" model="ir.actions.act_window">
+        <field name="name">Guest Services</field>
+        <field name="res_model">hotel.service.booking</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,8 +1,9 @@
 {
     'name': 'Hotel POS Folio Integration',
-    'version': '19.0.1.0.0',
+    'version': '19.0.2.0.0',
     'category': 'Point of Sale',
-    'summary': 'Charge Point of Sale orders to a hotel guest room folio',
+    'summary': 'Charge restaurant, bar, spa and minibar POS orders to a hotel guest '
+               'room folio, split by outlet',
     'author': 'Zenith Consulting',
     'license': 'LGPL-3',
     'depends': ['zc_hotel', 'point_of_sale'],

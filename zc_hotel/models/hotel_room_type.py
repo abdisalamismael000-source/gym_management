@@ -1,4 +1,4 @@
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class HotelRoomType(models.Model):
@@ -18,4 +18,15 @@ class HotelRoomType(models.Model):
         domain=[('type', '=', 'service')],
         help='Product used to invoice a night in this room type.')
     room_ids = fields.One2many('hotel.room', 'room_type_id', string='Rooms')
+    room_count = fields.Integer(compute='_compute_room_count', string='Rooms')
+    amenity_ids = fields.Many2many('hotel.amenity', string='Amenities')
+    rate_plan_ids = fields.One2many(
+        'hotel.rate.plan', 'room_type_id', string='Rate Plans')
+    image = fields.Image(string='Photo', max_width=1024, max_height=1024)
+    description = fields.Html(string='Description', translate=True)
     active = fields.Boolean(default=True)
+
+    @api.depends('room_ids')
+    def _compute_room_count(self):
+        for rec in self:
+            rec.room_count = len(rec.room_ids)

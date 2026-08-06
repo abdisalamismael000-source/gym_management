@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hotel_events_root" name="Events"
+              parent="zc_hotel.menu_hotel_root" sequence="25"/>
+    <menuitem id="menu_hotel_event_booking" name="Event Bookings"
+              parent="menu_hotel_events_root" action="action_event_booking"
+              sequence="10"/>
+    <menuitem id="menu_hotel_function_room" name="Function Rooms"
+              parent="menu_hotel_events_root" action="action_function_room"
+              sequence="20" groups="zc_hotel.group_hotel_manager"/>
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_folio" model="ir.actions.report">
+        <field name="name">Guest Folio</field>
+        <field name="model">hotel.folio</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zc_hotel.report_folio_document</field>
+        <field name="report_file">zc_hotel.report_folio_document</field>
+        <field name="binding_model_id" ref="model_hotel_folio"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_registration" model="ir.actions.report">
+        <field name="name">Registration Card</field>
+        <field name="model">hotel.reservation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zc_hotel.report_registration_document</field>
+        <field name="report_file">zc_hotel.report_registration_document</field>
+        <field name="binding_model_id" ref="model_hotel_reservation"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_night_audit" model="ir.actions.report">
+        <field name="name">Hotel Report</field>
+        <field name="model">hotel.report.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">zc_hotel.report_night_audit_document</field>
+        <field name="report_file">zc_hotel.report_night_audit_document</field>
+    </record>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_hall_hire" model="product.product">
+        <field name="name">Function Room Hire</field>
+        <field name="type">service</field>
+        <field name="list_price">1500.0</field>
+    </record>
+
+    <record id="function_room_grand" model="hotel.function.room">
+        <field name="name">Grand Ballroom</field>
+        <field name="capacity">300</field>
+        <field name="day_rate">1500.0</field>
+        <field name="product_id" ref="product_hall_hire"/>
+    </record>
+    <record id="function_room_boardroom" model="hotel.function.room">
+        <field name="name">Executive Boardroom</field>
+        <field name="capacity">20</field>
+        <field name="day_rate">400.0</field>
+        <field name="product_id" ref="product_hall_hire"/>
+    </record>
+
+    <record id="event_demo_wedding" model="hotel.event.booking">
+        <field name="title">Khan–Ali Wedding</field>
+        <field name="partner_id" ref="zc_hotel.guest_maria"/>
+        <field name="function_room_id" ref="function_room_grand"/>
+        <field name="event_type">wedding</field>
+        <field name="start_datetime"
+               eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d 16:00:00')"/>
+        <field name="end_datetime"
+               eval="(DateTime.today() + relativedelta(days=14)).strftime('%Y-%m-%d 23:00:00')"/>
+        <field name="pax">180</field>
+        <field name="setup_style">banquet</field>
+        <field name="amount">1500.0</field>
+        <field name="state">confirmed</field>
+    </record>
+</odoo>

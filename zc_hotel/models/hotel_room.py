@@ -7,8 +7,12 @@ class HotelRoom(models.Model):
     _order = 'name'
 
     name = fields.Char(string='Room Number', required=True)
+    property_id = fields.Many2one('hotel.property', string='Property')
     room_type_id = fields.Many2one('hotel.room.type', string='Room Type', required=True)
     floor = fields.Char()
+    capacity = fields.Integer(related='room_type_id.capacity', store=True,
+                              string='Max Occupancy')
+    amenity_ids = fields.Many2many('hotel.amenity', string='Amenities')
     state = fields.Selection([
         ('available', 'Available'),
         ('occupied', 'Occupied'),
@@ -17,6 +21,9 @@ class HotelRoom(models.Model):
     ], default='available', required=True, tracking=True)
     current_reservation_id = fields.Many2one(
         'hotel.reservation', string='Current Stay', compute='_compute_current_reservation')
+    current_guest_id = fields.Many2one(
+        'res.partner', string='Current Guest',
+        related='current_reservation_id.partner_id')
     active = fields.Boolean(default=True)
 
     _sql_constraints = [
@@ -34,6 +41,9 @@ class HotelRoom(models.Model):
 
     def action_set_available(self):
         self.write({'state': 'available'})
+
+    def action_set_dirty(self):
+        self.write({'state': 'dirty'})
 
     def action_set_out_of_service(self):
         self.write({'state': 'out_of_service'})

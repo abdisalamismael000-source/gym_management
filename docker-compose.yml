@@ -1,0 +1,36 @@
+# Run the Hotel Management suite locally in Odoo 19.
+#
+#   docker compose up -d
+#   # open http://localhost:8069, create a database, then install "Hotel Management"
+#
+# The repo root is mounted as an Odoo addons directory, so all five modules
+# (zc_hotel, zc_hotel_pos, zc_hotel_maintenance, zc_hotel_website,
+# zc_hotel_event) show up in the Apps list. Tip: enable Developer Mode and
+# "Update Apps List" if they don't appear immediately.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - odoo-db:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:19
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./:/mnt/extra-addons
+
+volumes:
+  odoo-db:
+  odoo-data:

@@ -5,13 +5,18 @@
         <field name="model">hotel.reservation</field>
         <field name="arch" type="xml">
             <list decoration-info="state == 'checked_in'"
-                  decoration-muted="state in ('checked_out','cancelled')">
+                  decoration-muted="state in ('checked_out','cancelled','no_show')">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="room_id"/>
+                <field name="room_type_id" optional="show"/>
                 <field name="check_in"/>
                 <field name="check_out"/>
                 <field name="nights"/>
+                <field name="board_type" optional="hide"/>
+                <field name="source" optional="hide"/>
+                <field name="amount_total" optional="show"/>
+                <field name="currency_id" column_invisible="1"/>
                 <field name="state" widget="badge"/>
             </list>
         </field>
@@ -30,16 +35,20 @@
                             invisible="state not in ('draft','confirmed')"/>
                     <button name="action_check_out" type="object" string="Check Out"
                             class="btn-primary" invisible="state != 'checked_in'"/>
+                    <button name="action_no_show" type="object" string="No Show"
+                            invisible="state not in ('draft','confirmed')"/>
                     <button name="action_cancel" type="object" string="Cancel"
-                            invisible="state in ('checked_out','cancelled')"/>
+                            invisible="state in ('checked_out','cancelled','no_show')"/>
+                    <button name="%(action_report_registration)d" type="action"
+                            string="Print Registration Card"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,checked_in,checked_out"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <button name="folio_id" type="object" class="oe_stat_button"
-                                icon="fa-book" invisible="not folio_id"
-                                context="{'default_folio': folio_id}">
+                        <button name="action_view_folio" type="object"
+                                class="oe_stat_button" icon="fa-book"
+                                invisible="not folio_id">
                             <field name="folio_id" widget="statinfo" string="Folio"/>
                         </button>
                     </div>
@@ -49,13 +58,32 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
+                            <field name="company_account_id"/>
                             <field name="room_id"/>
                             <field name="room_type_id"/>
+                            <field name="property_id"/>
+                            <field name="source"/>
+                            <field name="channel_id"/>
+                            <field name="channel_reference"
+                                   invisible="source != 'ota'"/>
                         </group>
                         <group>
                             <field name="check_in"/>
                             <field name="check_out"/>
                             <field name="nights"/>
+                            <field name="arrival_time"/>
+                            <field name="board_type"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Occupancy">
+                            <field name="adults"/>
+                            <field name="children"/>
+                        </group>
+                        <group string="Billing">
+                            <field name="deposit_amount"/>
+                            <field name="amount_total"/>
+                            <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
                 </sheet>
@@ -64,9 +92,103 @@
         </field>
     </record>
 
+    <record id="view_hotel_reservation_kanban" model="ir.ui.view">
+        <field name="name">hotel.reservation.kanban</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_title">
+                                <strong><field name="partner_id"/></strong>
+                            </div>
+                            <div class="o_kanban_record_subtitle">
+                                <field name="name"/> · Room <field name="room_id"/>
+                            </div>
+                            <div>
+                                <i class="fa fa-calendar me-1"/>
+                                <field name="check_in"/> → <field name="check_out"/>
+                                (<field name="nights"/>n)
+                            </div>
+                            <div class="mt-1">
+                                <field name="amount_total" widget="monetary"/>
+                                <field name="currency_id" invisible="1"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_calendar" model="ir.ui.view">
+        <field name="name">hotel.reservation.calendar</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <calendar string="Reservations" date_start="check_in" date_stop="check_out"
+                      color="room_type_id" mode="month">
+                <field name="partner_id"/>
+                <field name="room_id"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_pivot" model="ir.ui.view">
+        <field name="name">hotel.reservation.pivot</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <pivot string="Reservation Analysis">
+                <field name="room_type_id" type="row"/>
+                <field name="check_in" interval="month" type="col"/>
+                <field name="nights" type="measure"/>
+                <field name="amount_total" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_graph" model="ir.ui.view">
+        <field name="name">hotel.reservation.graph</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <graph string="Reservation Analysis" type="bar">
+                <field name="room_type_id"/>
+                <field name="amount_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_hotel_reservation_search" model="ir.ui.view">
+        <field name="name">hotel.reservation.search</field>
+        <field name="model">hotel.reservation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="room_id"/>
+                <filter name="arrivals_today" string="Arrivals Today"
+                        domain="[('check_in','=',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="departures_today" string="Departures Today"
+                        domain="[('check_out','=',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="in_house" string="In House"
+                        domain="[('state','=','checked_in')]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
+                <separator/>
+                <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                <filter name="group_room_type" string="Room Type"
+                        context="{'group_by':'room_type_id'}"/>
+                <filter name="group_source" string="Source" context="{'group_by':'source'}"/>
+            </search>
+        </field>
+    </record>
+
     <record id="action_hotel_reservation" model="ir.actions.act_window">
         <field name="name">Reservations</field>
         <field name="res_model">hotel.reservation</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">calendar,list,kanban,pivot,graph,form</field>
+        <field name="search_view_id" ref="view_hotel_reservation_search"/>
     </record>
 </odoo>

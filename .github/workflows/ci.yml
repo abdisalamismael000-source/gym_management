@@ -1,0 +1,77 @@
+name: Odoo Module Install Test
+
+# Installs every module in this repo on a clean Odoo 19 + PostgreSQL database
+# with tests enabled. Any load error (bad manifest, XML, model, view or a
+# failing test) makes Odoo exit non-zero and fails the job.
+
+on:
+  push:
+    branches:
+      - "claude/**"
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-test:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U odoo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    container:
+      image: odoo:19
+      # Run as root so Odoo can write its data dir and read the checked-out
+      # sources regardless of the runner's file ownership.
+      options: --user root
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Stage modules into the addons path
+        # $GITHUB_WORKSPACE resolves correctly *inside* the container, unlike the
+        # ${{ github.workspace }} expression which yields the host path.
+        run: |
+          set -e
+          mkdir -p /mnt/extra-addons
+          cp -r "$GITHUB_WORKSPACE/repo/." /mnt/extra-addons/
+
+      - name: Install modules and run this repo's tests
+        # Install validates every module (and its dependencies: account, stock,
+        # website, point_of_sale, maintenance, hr...). --test-tags scopes the
+        # test run to THIS repo's modules so the flaky, browser-dependent core
+        # test suite does not run in a headless CI container.
+        run: |
+          set -e
+          odoo \
+            --stop-after-init \
+            --no-http \
+            --db_host=db \
+            --db_port=5432 \
+            -r odoo \
+            -w odoo \
+            -d ci_test \
+            --data-dir=/tmp/odoo-data \
+            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
+            -i zc_hotel,zc_hotel_pos,zc_hotel_maintenance,zc_hotel_website,zc_hotel_event \
+            --test-enable \
+            --test-tags=/zc_hotel,/zc_hotel_pos,/zc_hotel_maintenance,/zc_hotel_website,/zc_hotel_event \
+            --log-level=test

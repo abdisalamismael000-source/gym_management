@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hotel_room_form_maintenance" model="ir.ui.view">
+        <field name="name">hotel.room.form.maintenance</field>
+        <field name="model">hotel.room</field>
+        <field name="inherit_id" ref="zc_hotel.view_hotel_room_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_report_issue" type="object"
+                        string="Report Issue"/>
+            </xpath>
+            <xpath expr="//field[@name='current_guest_id']" position="after">
+                <field name="open_request_count"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_maintenance_equipment_form_hotel" model="ir.ui.view">
+        <field name="name">maintenance.equipment.form.hotel</field>
+        <field name="model">maintenance.equipment</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="hotel_room_id"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_maintenance_request_form_hotel" model="ir.ui.view">
+        <field name="name">maintenance.request.form.hotel</field>
+        <field name="model">maintenance.request</field>
+        <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="hotel_room_id"/>
+                <field name="block_room"/>
+            </field>
+        </field>
+    </record>
+</odoo>

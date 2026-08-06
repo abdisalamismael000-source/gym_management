@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hotel_function_room_user,hotel.function.room.user,model_hotel_function_room,zc_hotel.group_hotel_user,1,0,0,0
+access_hotel_function_room_manager,hotel.function.room.manager,model_hotel_function_room,zc_hotel.group_hotel_manager,1,1,1,1
+access_hotel_event_booking_user,hotel.event.booking.user,model_hotel_event_booking,zc_hotel.group_hotel_user,1,1,1,0
+access_hotel_event_booking_manager,hotel.event.booking.manager,model_hotel_event_booking,zc_hotel.group_hotel_manager,1,1,1,1
