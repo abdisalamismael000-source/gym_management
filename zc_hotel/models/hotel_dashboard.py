@@ -2,112 +2,204 @@ from datetime import timedelta
 
 from odoo import api, fields, models
 
+# Palette used to give guest avatars a stable, pleasant colour.
+_AVATAR_COLORS = ['#3E9E6E', '#4C86C6', '#B08733', '#D2695F', '#7C6BB0', '#D99A2B']
+
+
+def _avatar(name):
+    name = (name or '?').strip()
+    parts = name.split()
+    initials = (parts[0][:1] + (parts[-1][:1] if len(parts) > 1 else '')).upper() or '?'
+    color = _AVATAR_COLORS[sum(ord(c) for c in name) % len(_AVATAR_COLORS)]
+    return initials, color
+
 
 class HotelDashboard(models.AbstractModel):
-    """Service model exposing front-desk KPIs to the OWL dashboard."""
+    """Service model exposing front-desk KPIs and worklists to the OWL dashboard."""
     _name = 'hotel.dashboard'
     _description = 'Hotel Front Desk Dashboard'
 
     @api.model
     def _trend_series(self, days=7):
-        """Return per-day series for the KPI sparklines over the last `days`."""
-        Reservation = self.env['hotel.reservation']
-        Room = self.env['hotel.room']
+        """Per-day room revenue for the KPI sparkline / area chart."""
         FolioLine = self.env['hotel.folio.line']
         today = fields.Date.context_today(self)
-        net_sellable = max(Room.search_count([('active', '=', True)]), 1)
-
-        occupancy, revenue, arrivals, adr = [], [], [], []
+        revenue, labels = [], []
         for i in range(days - 1, -1, -1):
             day = today - timedelta(days=i)
-            covering = Reservation.search_count([
-                ('check_in', '<=', day), ('check_out', '>', day),
-                ('state', 'in', ('confirmed', 'checked_in', 'checked_out')),
-            ])
-            day_lines = FolioLine.search([
+            lines = FolioLine.search([
                 ('charge_type', '=', 'room'),
                 ('date', '>=', fields.Datetime.to_datetime(day)),
                 ('date', '<', fields.Datetime.to_datetime(day + timedelta(days=1))),
             ])
-            day_rev = sum(day_lines.mapped('price_subtotal'))
-            sold = sum(day_lines.mapped('quantity')) or 0
-            occupancy.append(round(covering / net_sellable * 100, 1))
-            revenue.append(round(day_rev, 2))
-            arrivals.append(Reservation.search_count([('check_in', '=', day)]))
-            adr.append(round(day_rev / sold, 2) if sold else 0.0)
-        return {'occupancy': occupancy, 'revenue': revenue,
-                'arrivals': arrivals, 'adr': adr}
+            revenue.append(round(sum(lines.mapped('price_subtotal')), 2))
+            labels.append(day.strftime('%a'))
+        return revenue, labels
+
+    @api.model
+    def _delta(self, current, previous):
+        """Percentage change vs a previous period, rounded; None if not comparable."""
+        if not previous:
+            return None
+        return round((current - previous) / previous * 100, 1)
 
     @api.model
     def get_dashboard_data(self):
         today = fields.Date.context_today(self)
         month_start = today.replace(day=1)
+        week_ago = today - timedelta(days=7)
         Reservation = self.env['hotel.reservation']
         Room = self.env['hotel.room']
         FolioLine = self.env['hotel.folio.line']
+        currency = self.env.company.currency_id
 
-        # --- Room inventory ------------------------------------------------
+        # --- Room inventory -----------------------------------------------
         sellable_rooms = Room.search_count([('active', '=', True)])
         out_of_service = Room.search_count([('state', '=', 'out_of_service')])
         available_rooms = Room.search_count([('state', '=', 'available')])
         dirty_rooms = Room.search_count([('state', '=', 'dirty')])
         occupied_rooms = Room.search_count([('state', '=', 'occupied')])
 
-        # --- Today's movements --------------------------------------------
-        arrivals = Reservation.search_count([
-            ('check_in', '=', today),
-            ('state', 'in', ('draft', 'confirmed', 'checked_in')),
-        ])
-        departures = Reservation.search_count([
-            ('check_out', '=', today),
-            ('state', 'in', ('checked_in', 'checked_out')),
-        ])
+        # --- Movements ----------------------------------------------------
         in_house = Reservation.search_count([('state', '=', 'checked_in')])
+        active_res = Reservation.search_count([('state', 'in', ('confirmed', 'checked_in'))])
 
-        # --- Revenue metrics (month to date) ------------------------------
-        room_lines = FolioLine.search([
+        # --- Revenue ------------------------------------------------------
+        room_lines_mtd = FolioLine.search([
             ('charge_type', '=', 'room'),
             ('date', '>=', fields.Datetime.to_datetime(month_start)),
         ])
-        room_revenue = sum(room_lines.mapped('price_subtotal'))
-        rooms_sold = sum(room_lines.mapped('quantity')) or 0
+        room_revenue = sum(room_lines_mtd.mapped('price_subtotal'))
+        rooms_sold = sum(room_lines_mtd.mapped('quantity')) or 0
         total_revenue = sum(FolioLine.search([
             ('date', '>=', fields.Datetime.to_datetime(month_start)),
         ]).mapped('price_subtotal'))
 
-        # --- KPIs ----------------------------------------------------------
-        # Occupancy: rooms currently occupied / sellable rooms.
         net_sellable = max(sellable_rooms - out_of_service, 0)
         occupancy_rate = (occupied_rooms / net_sellable * 100) if net_sellable else 0.0
-        # ADR: room revenue / room-nights sold.
         adr = (room_revenue / rooms_sold) if rooms_sold else 0.0
-        # RevPAR: room revenue / available room-nights this month.
         days_elapsed = (today - month_start).days + 1
-        available_room_nights = net_sellable * days_elapsed
-        revpar = (room_revenue / available_room_nights) if available_room_nights else 0.0
+        revpar = (room_revenue / (net_sellable * days_elapsed)) if net_sellable else 0.0
+
+        # --- Deltas (this week vs previous week) --------------------------
+        rev_this_week = sum(FolioLine.search([
+            ('date', '>=', fields.Datetime.to_datetime(week_ago))]).mapped('price_subtotal'))
+        rev_prev_week = sum(FolioLine.search([
+            ('date', '>=', fields.Datetime.to_datetime(week_ago - timedelta(days=7))),
+            ('date', '<', fields.Datetime.to_datetime(week_ago))]).mapped('price_subtotal'))
+        arr_this_week = Reservation.search_count([('check_in', '>=', week_ago)])
+        arr_prev_week = Reservation.search_count([
+            ('check_in', '>=', week_ago - timedelta(days=7)), ('check_in', '<', week_ago)])
+
+        revenue_trend, trend_labels = self._trend_series(7)
 
         return {
-            'currency_id': self.env.company.currency_id.id,
-            'currency_symbol': self.env.company.currency_id.symbol,
+            'currency_symbol': currency.symbol,
+            'currency_position': currency.position,
             'company_name': self.env.company.name,
-            'sellable_rooms': sellable_rooms,
-            'available_rooms': available_rooms,
-            'occupied_rooms': occupied_rooms,
-            'dirty_rooms': dirty_rooms,
-            'out_of_service': out_of_service,
-            'arrivals': arrivals,
-            'departures': departures,
-            'in_house': in_house,
+            'today_label': today.strftime('%d %b %Y'),
+            # KPIs
+            'total_revenue': round(total_revenue, 2),
+            'room_revenue': round(room_revenue, 2),
             'occupancy_rate': round(occupancy_rate, 1),
             'adr': round(adr, 2),
             'revpar': round(revpar, 2),
-            'room_revenue': round(room_revenue, 2),
-            'total_revenue': round(total_revenue, 2),
-            'trends': self._trend_series(7),
+            'active_reservations': active_res,
+            'in_house': in_house,
+            'delta_revenue': self._delta(rev_this_week, rev_prev_week),
+            'delta_arrivals': self._delta(arr_this_week, arr_prev_week),
+            # charts
+            'revenue_trend': revenue_trend,
+            'trend_labels': trend_labels,
             'status_breakdown': [
-                {'label': 'Available', 'value': available_rooms, 'color': '#22c55e'},
-                {'label': 'Occupied', 'value': occupied_rooms, 'color': '#6366f1'},
-                {'label': 'Needs Cleaning', 'value': dirty_rooms, 'color': '#f59e0b'},
-                {'label': 'Out of Service', 'value': out_of_service, 'color': '#ef4444'},
+                {'label': 'Available', 'value': available_rooms, 'color': '#3E9E6E'},
+                {'label': 'Occupied', 'value': occupied_rooms, 'color': '#D2695F'},
+                {'label': 'Cleaning', 'value': dirty_rooms, 'color': '#D99A2B'},
+                {'label': 'Out of Service', 'value': out_of_service, 'color': '#8A857A'},
             ],
+            'sellable_rooms': sellable_rooms,
+            # worklists
+            'arrivals': self._arrivals(today),
+            'departures': self._departures(today),
+            'upcoming': self._upcoming(today),
+            'recent_bookings': self._recent_bookings(),
         }
+
+    # ------------------------------------------------------------------
+    # Worklists
+    # ------------------------------------------------------------------
+    @api.model
+    def _arrivals(self, today):
+        res = self.env['hotel.reservation'].search([
+            ('check_in', '=', today),
+            ('state', 'in', ('draft', 'confirmed')),
+        ], order='room_id', limit=8)
+        out = []
+        for r in res:
+            initials, color = _avatar(r.partner_id.name)
+            out.append({
+                'id': r.id, 'name': r.partner_id.name, 'initials': initials, 'color': color,
+                'room': r.room_id.name, 'room_type': r.room_type_id.name,
+                'nights': r.nights,
+            })
+        return out
+
+    @api.model
+    def _departures(self, today):
+        res = self.env['hotel.reservation'].search([
+            ('check_out', '=', today),
+            ('state', '=', 'checked_in'),
+        ], order='room_id', limit=8)
+        out = []
+        for r in res:
+            initials, color = _avatar(r.partner_id.name)
+            out.append({
+                'id': r.id, 'name': r.partner_id.name, 'initials': initials, 'color': color,
+                'room': r.room_id.name, 'room_type': r.room_type_id.name,
+                'balance': round(r.folio_id.balance_due, 2) if r.folio_id else 0.0,
+            })
+        return out
+
+    @api.model
+    def _upcoming(self, today):
+        res = self.env['hotel.reservation'].search([
+            ('check_in', '>', today),
+            ('state', 'in', ('draft', 'confirmed')),
+        ], order='check_in', limit=6)
+        out = []
+        for r in res:
+            out.append({
+                'id': r.id, 'name': r.partner_id.name,
+                'day': r.check_in.strftime('%d'), 'month': r.check_in.strftime('%b'),
+                'room_type': r.room_type_id.name, 'nights': r.nights,
+                'state': r.state,
+            })
+        return out
+
+    @api.model
+    def _recent_bookings(self):
+        res = self.env['hotel.reservation'].search([], order='create_date desc', limit=6)
+        state_labels = dict(self.env['hotel.reservation']._fields['state'].selection)
+        out = []
+        for r in res:
+            out.append({
+                'id': r.id, 'name': r.partner_id.name, 'ref': r.name,
+                'check_in': r.check_in and r.check_in.strftime('%b %d') or '',
+                'check_out': r.check_out and r.check_out.strftime('%b %d') or '',
+                'amount': round(r.amount_total, 2),
+                'state': r.state, 'state_label': state_labels.get(r.state, r.state),
+            })
+        return out
+
+    # ------------------------------------------------------------------
+    # Inline actions from the worklists
+    # ------------------------------------------------------------------
+    @api.model
+    def check_in(self, reservation_id):
+        self.env['hotel.reservation'].browse(reservation_id).action_check_in()
+        return True
+
+    @api.model
+    def check_out(self, reservation_id):
+        self.env['hotel.reservation'].browse(reservation_id).action_check_out()
+        return True

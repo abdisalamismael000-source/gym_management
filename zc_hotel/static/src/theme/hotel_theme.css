@@ -1,0 +1,68 @@
+/* Aurelia luxury theme for the Odoo backend (hotel-branded).
+   Cosmetic only: fonts, gold accent, softer cards. Safe to remove.
+   If a rule loses to Odoo's specificity it simply falls back — never breaks. */
+
+:root {
+    --hg-gold: #B08733;
+    --hg-gold-rgb: 176, 135, 51;
+    /* Re-brand the primary accent to champagne gold. */
+    --primary: var(--hg-gold);
+    --o-brand-primary: var(--hg-gold);
+    --bs-primary: var(--hg-gold);
+    --bs-primary-rgb: var(--hg-gold-rgb);
+    --bs-link-color: #8C6A22;
+    --bs-link-hover-color: #6F521A;
+}
+
+/* Base UI font */
+.o_web_client, .o_action_manager, .modal, .o_popover {
+    font-family: 'Inter', -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Serif display for brand + page/section titles */
+.o_main_navbar .o_menu_brand,
+.o_breadcrumb .o_last_breadcrumb_item,
+.o_form_view .oe_title h1,
+.o_form_view .oe_title h1 input,
+.o_setting_container .app_name,
+.o_field_widget.o_field_char.o_text_overflow.o_form_uri {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: .2px;
+}
+
+/* Gold primary buttons */
+.btn-primary {
+    --bs-btn-bg: var(--hg-gold);
+    --bs-btn-border-color: var(--hg-gold);
+    --bs-btn-hover-bg: #9C7629;
+    --bs-btn-hover-border-color: #9C7629;
+    --bs-btn-active-bg: #8C6A22;
+    --bs-btn-active-border-color: #8C6A22;
+    --bs-btn-disabled-bg: var(--hg-gold);
+    --bs-btn-disabled-border-color: var(--hg-gold);
+}
+.btn-secondary {
+    --bs-btn-color: #8C6A22;
+    --bs-btn-hover-color: #6F521A;
+}
+
+/* Softer, more premium cards & sheets */
+.o_form_sheet {
+    border-radius: 14px;
+}
+.o_kanban_record, .o_kanban_record .oe_kanban_card {
+    border-radius: 14px;
+}
+
+/* Gold active items in the top menu / control panel */
+.o_main_navbar .o_menu_sections .dropdown-item:active {
+    background-color: rgba(var(--hg-gold-rgb), .12);
+    color: var(--hg-gold);
+}
+
+/* Dark-mode nudge: keep gold slightly brighter for contrast */
+:root[data-bs-theme="dark"] {
+    --hg-gold: #C79A44;
+    --bs-link-color: #D8B667;
+    --bs-link-hover-color: #E4C77F;
+}

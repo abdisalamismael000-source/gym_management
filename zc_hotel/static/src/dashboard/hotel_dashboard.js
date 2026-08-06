@@ -11,117 +11,119 @@ export class HotelDashboard extends Component {
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
-        this.state = useState({ data: null, loading: true });
-
-        onWillStart(async () => {
-            await this.loadData();
-        });
+        this.state = useState({ data: null, loading: true, busy: false });
+        onWillStart(() => this.loadData());
     }
 
     async loadData() {
         this.state.loading = true;
-        this.state.data = await this.orm.call(
-            "hotel.dashboard",
-            "get_dashboard_data",
-            []
-        );
+        this.state.data = await this.orm.call("hotel.dashboard", "get_dashboard_data", []);
         this.state.loading = false;
     }
 
-    formatMoney(value) {
-        const symbol = this.state.data ? this.state.data.currency_symbol || "" : "";
+    // --- formatting -------------------------------------------------------
+    money(value) {
+        const d = this.state.data || {};
+        const sym = d.currency_symbol || "";
         const amount = (value || 0).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         });
-        return `${symbol} ${amount}`;
+        return d.currency_position === "after" ? `${amount} ${sym}` : `${sym} ${amount}`;
     }
 
-    // --- Sparklines -------------------------------------------------------
-    /** Build normalized polyline + area path strings for a numeric series. */
-    sparkline(series) {
-        const W = 100;
-        const H = 32;
-        const pad = 3;
-        const data = series && series.length ? series : [0, 0];
-        const min = Math.min(...data);
-        const max = Math.max(...data);
-        const span = max - min || 1;
-        const n = data.length;
-        const pts = data.map((v, i) => {
+    deltaClass(v) {
+        if (v === null || v === undefined) return "o_hg_flat";
+        return v >= 0 ? "o_hg_up" : "o_hg_down";
+    }
+    deltaText(v) {
+        if (v === null || v === undefined) return "—";
+        const arrow = v >= 0 ? "▲" : "▼";
+        return `${arrow} ${Math.abs(v)}%`;
+    }
+
+    // --- revenue area chart ----------------------------------------------
+    get revenueChart() {
+        const d = this.state.data;
+        const series = (d && d.revenue_trend) || [0, 0];
+        const W = 600, H = 180, pad = 12;
+        const max = Math.max(...series, 1);
+        const n = series.length;
+        const pts = series.map((v, i) => {
             const x = n === 1 ? W / 2 : (i / (n - 1)) * (W - pad * 2) + pad;
-            const y = H - pad - ((v - min) / span) * (H - pad * 2);
-            return [Number(x.toFixed(2)), Number(y.toFixed(2))];
+            const y = H - pad - (v / max) * (H - pad * 2);
+            return [Number(x.toFixed(1)), Number(y.toFixed(1))];
         });
         const line = pts.map((p) => p.join(",")).join(" ");
         const area =
             `M${pts[0][0]},${H} ` +
             pts.map((p) => `L${p[0]},${p[1]}`).join(" ") +
             ` L${pts[n - 1][0]},${H} Z`;
-        const up = data[n - 1] >= data[0];
-        return { line, area, up };
+        return { line, area, last: pts[n - 1], labels: (d && d.trend_labels) || [], pts, W, H };
     }
 
-    // --- Donut ------------------------------------------------------------
+    // --- donut ------------------------------------------------------------
     get donutSegments() {
-        const data = this.state.data;
-        if (!data) {
-            return [];
-        }
-        const items = data.status_breakdown || [];
+        const d = this.state.data;
+        if (!d) return [];
+        const items = d.status_breakdown || [];
         const total = items.reduce((s, it) => s + (it.value || 0), 0) || 1;
-        const C = 2 * Math.PI * 42; // r = 42
+        const C = 2 * Math.PI * 40;
         let offset = 0;
         return items.map((it) => {
             const len = ((it.value || 0) / total) * C;
-            const seg = {
-                color: it.color,
-                dash: `${len} ${C - len}`,
-                offset: -offset,
-            };
+            const seg = { color: it.color, dash: `${len} ${C - len}`, offset: -offset };
             offset += len;
             return seg;
         });
     }
 
-    get totalRooms() {
-        const data = this.state.data;
-        return data ? data.sellable_rooms : 0;
+    // --- inline actions ---------------------------------------------------
+    async doCheckIn(id) {
+        if (this.state.busy) return;
+        this.state.busy = true;
+        try {
+            await this.orm.call("hotel.dashboard", "check_in", [id]);
+            await this.loadData();
+        } finally {
+            this.state.busy = false;
+        }
+    }
+    async doCheckOut(id) {
+        if (this.state.busy) return;
+        this.state.busy = true;
+        try {
+            await this.orm.call("hotel.dashboard", "check_out", [id]);
+            await this.loadData();
+        } finally {
+            this.state.busy = false;
+        }
     }
 
-    // --- Navigation -------------------------------------------------------
-    openReservations(extraContext = {}) {
+    openReservation(id) {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "hotel.reservation",
+            res_id: id,
+            views: [[false, "form"]],
+        });
+    }
+    newReservation() {
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            name: "New Reservation",
+            res_model: "hotel.reservation",
+            views: [[false, "form"]],
+            target: "current",
+        });
+    }
+    openReservations(ctx = {}) {
         this.action.doAction({
             type: "ir.actions.act_window",
             name: "Reservations",
             res_model: "hotel.reservation",
-            views: [
-                [false, "list"],
-                [false, "form"],
-            ],
-            context: extraContext,
-        });
-    }
-
-    openArrivals() {
-        this.openReservations({ search_default_arrivals_today: 1 });
-    }
-    openDepartures() {
-        this.openReservations({ search_default_departures_today: 1 });
-    }
-    openInHouse() {
-        this.openReservations({ search_default_in_house: 1 });
-    }
-    openHousekeeping() {
-        this.action.doAction({
-            type: "ir.actions.act_window",
-            name: "Housekeeping",
-            res_model: "hotel.housekeeping",
-            views: [
-                [false, "kanban"],
-                [false, "list"],
-                [false, "form"],
-            ],
+            views: [[false, "list"], [false, "form"]],
+            context: ctx,
         });
     }
 }

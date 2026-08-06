@@ -54,7 +54,11 @@ A complete Property Management System (PMS) for hotels, resorts and guesthouses:
     ],
     'assets': {
         'web.assets_backend': [
-            'zc_hotel/static/src/dashboard/**/*',
+            'zc_hotel/static/src/theme/fonts.css',
+            'zc_hotel/static/src/theme/hotel_theme.css',
+            'zc_hotel/static/src/dashboard/hotel_dashboard.css',
+            'zc_hotel/static/src/dashboard/hotel_dashboard.js',
+            'zc_hotel/static/src/dashboard/hotel_dashboard.xml',
         ],
     },
     'installable': True,
